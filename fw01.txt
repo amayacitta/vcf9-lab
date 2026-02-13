@@ -1,0 +1,150 @@
+/interface bridge
+add admin-mac=04:F4:1C:13:5F:3A auto-mac=no comment=LAN name=bridge priority=0x4096
+/interface ethernet
+set [ find default-name=ether1 ] advertise=1G-baseT-full comment=WAN l2mtu=1500
+set [ find default-name=sfp-sfpplus1 ] l2mtu=9126 mtu=9000
+set [ find default-name=sfp-sfpplus2 ] l2mtu=9126 mtu=9000
+set [ find default-name=sfp-sfpplus3 ] l2mtu=9126 mtu=9000
+set [ find default-name=sfp-sfpplus4 ] l2mtu=9126 mtu=9000
+set [ find default-name=sfp1 ] l2mtu=9126 mtu=9000
+set [ find default-name=sfp2 ] l2mtu=9126 mtu=9000
+set [ find default-name=sfp3 ] l2mtu=9126 mtu=9000
+set [ find default-name=sfp4 ] l2mtu=9126 mtu=9000
+set [ find default-name=sfp5 ] l2mtu=9126 mtu=9000
+/interface wireguard
+add comment="Wireguard VPN" listen-port=13231 mtu=1420 name=wg0
+/interface vlan
+add comment="Host MGMT" interface=bridge name=vlan100 vlan-id=100
+add comment="VM MGMT" interface=bridge mtu=1508 name=vlan101 vlan-id=101
+add comment=VMotion interface=bridge mtu=9000 name=vlan102 vlan-id=102
+add comment=vSAN interface=bridge mtu=9000 name=vlan103 vlan-id=103
+add comment="NSX Host Transport" interface=bridge mtu=9000 name=vlan104 vlan-id=104
+add comment="NSX Edge Transport" interface=bridge mtu=9000 name=vlan105 vlan-id=105
+add comment="NSX Edge Uplink-A" interface=bridge name=vlan106 vlan-id=106
+add comment="NSX Edge Uplink-B" interface=bridge name=vlan107 vlan-id=107
+add comment="NSX VPC External Blocks" interface=bridge l3-hw-offloading=no name=vlan108 vlan-id=108
+/interface list
+add name=WAN
+add name=LAN
+/ip dns forwarders
+add dns-servers=1.1.1.1 name=Cloudflare
+add dns-servers=9.9.9.9 name=Quad9
+/ip pool
+add comment="Default VLAN 1" name=home ranges=10.166.1.10-10.166.1.200
+/routing bgp instance
+add as=64512 disabled=no name=nsx-uplink-a router-id=10.166.106.254 vrf=main
+add as=64512 disabled=no name=nsx-uplink-b router-id=10.166.107.254 routing-table=main vrf=main
+/routing bgp template
+set default disabled=no routing-table=main
+/interface bridge port
+add bridge=bridge comment=defconf disabled=yes interface=ether1
+add bridge=bridge comment=defconf interface=sfp-sfpplus1
+add bridge=bridge comment=defconf interface=sfp-sfpplus2
+add bridge=bridge comment=defconf interface=sfp-sfpplus3
+add bridge=bridge comment=defconf interface=sfp-sfpplus4
+add bridge=bridge comment=defconf interface=sfp1
+add bridge=bridge comment=defconf interface=sfp2
+add bridge=bridge comment=defconf interface=sfp3
+add bridge=bridge comment=defconf interface=sfp4
+add bridge=bridge comment=defconf interface=sfp5
+/ip neighbor discovery-settings
+set discover-interface-list=all
+/interface bridge vlan
+add bridge=bridge comment=tag-all tagged=sfp-sfpplus1,sfp-sfpplus2,sfp-sfpplus3,sfp-sfpplus4,sfp1,sfp2,sfp3,sfp4,sfp5 vlan-ids=100-108
+/interface detect-internet
+set detect-interface-list=all
+/interface list member
+add interface=bridge list=LAN
+add interface=pppoe-zen-out list=WAN
+add interface=ether1 list=WAN
+/interface ovpn-server server
+add mac-address=FE:FC:80:BC:40:6D name=ovpn-server1
+/interface wireguard peers
+add allowed-address=192.168.178.0/24,10.166.0.0/16 client-address=10.166.255.2/32 client-endpoint=217.155.45.233 client-keepalive=25s comment="AC Laptop" endpoint-address=10.166.255.2 interface=wg0 name=ac-laptop public-key="blah"
+add allowed-address=192.168.178.0/24,10.166.0.0/16 client-address=10.166.255.3/32 client-endpoint=217.155.45.233 client-keepalive=25s comment="AC Phone" endpoint-address=10.166.255.3 interface=wg0 name=ac-phone public-key="blah"
+/ip address
+add address=10.166.100.254/24 comment="Host Management" interface=vlan100 network=10.166.100.0
+add address=10.166.101.254/24 comment="VM Management" interface=vlan101 network=10.166.101.0
+add address=10.166.102.254/24 comment=VMotion interface=vlan102 network=10.166.102.0
+add address=10.166.103.254/24 comment=vSAN interface=vlan103 network=10.166.103.0
+add address=10.166.104.254/24 comment="NSX Host Transport" interface=vlan104 network=10.166.104.0
+add address=10.166.105.254/24 comment="NSX Edge Transport" interface=vlan105 network=10.166.105.0
+add address=10.166.106.254/24 comment="NSX Edge Uplink-A" interface=vlan106 network=10.166.106.0
+add address=10.166.107.254/24 comment="NSX Edge Uplink-B" interface=vlan107 network=10.166.107.0
+add address=10.166.255.1/24 comment=Wireguard interface=wg0 network=10.166.255.0
+add address=10.166.1.254/24 comment=Home interface=bridge network=10.166.1.0
+add address=192.168.178.2/24 comment=WAN interface=ether1 network=192.168.178.0
+add address=10.166.108.254/24 comment="NSX VPC External Blocks" interface=vlan108 network=10.166.108.0
+/ip dhcp-client
+add disabled=yes interface=ether1
+/ip dhcp-server
+add address-pool=home interface=bridge name=default-lan
+/ip dhcp-server network
+add address=10.166.1.0/24 dns-server=10.166.1.254 domain=aclab.uk gateway=10.166.1.254 netmask=24 ntp-server=10.166.1.254
+/ip dns
+set allow-remote-requests=yes servers=9.9.9.9,1.1.1.1
+/ip dns static
+add address=192.168.178.2 comment=Firewall name=fw01.aclab.uk type=A
+add cname=depot01.aclab.uk comment="Backup Alias" name=backups type=CNAME
+add cname=fw01.aclab.uk comment="Wireguard Alias" name=home type=CNAME
+add address=10.166.100.10 comment="ESX Host" name=esx01.aclab.uk type=A
+add address=10.166.100.11 comment="ESX Host" name=esx02.aclab.uk type=A
+add address=10.166.100.12 comment="ESX Host" name=esx03.aclab.uk type=A
+add address=10.166.101.1 comment="VCF Depot and Backups" name=depot01.aclab.uk type=A
+add address=10.166.101.10 comment="VCF SDDC Manager / Installer" name=sddcm01.aclab.uk type=A
+add address=10.166.101.11 comment="VCF Operations" name=ops01a.aclab.uk type=A
+add address=10.166.101.12 comment="VCF Operations Fleet Manager" name=opsfm01.aclab.uk type=A
+add address=10.166.101.13 comment="VCF Operations Collector" name=opsc01.aclab.uk type=A
+add address=10.166.101.14 comment="VCF Automation" name=auto01.aclab.uk type=A
+add address=10.166.101.17 comment=vCenter name=vc01.aclab.uk type=A
+add address=10.166.101.18 comment="NSX Manager VIP" name=nsx01.aclab.uk type=A
+add address=10.166.101.19 comment="NSX Manager Node 01" name=nsxm01.aclab.uk type=A
+add address=10.166.101.20 comment="Edge Node 01" name=edge01.aclab.uk type=A
+add address=10.166.101.21 comment="Edge Node 02" name=edge02.aclab.uk type=A
+/ip firewall filter
+add action=accept chain=input comment="Allow Wireguard" dst-port=13231 protocol=udp src-address=0.0.0.0
+add action=accept chain=forward comment="Allow Egress" dst-address=0.0.0.0/0 src-address=10.166.0.0/16
+add action=accept chain=forward comment="Allow Ingress" dst-address=10.166.0.0/16 log=yes src-address=0.0.0.0/0
+add action=drop chain=forward comment="Drop All" log=yes log-prefix=drop_
+/ip firewall nat
+add action=masquerade chain=srcnat comment="Default SNAT" log=yes log-prefix=masquerade_nat out-interface=ether1 src-address=10.166.0.0/16
+/ip hotspot profile
+set [ find default=yes ] html-directory=hotspot
+/ip route
+add disabled=no distance=1 dst-address=0.0.0.0/0 gateway=192.168.178.1 routing-table=main suppress-hw-offload=no
+/ip service
+set ftp disabled=yes
+set telnet disabled=yes
+set www-ssl certificate=aclabuk_wildcard disabled=no tls-version=only-1.2
+/ip ssh
+set host-key-type=ed25519
+/ipv6 nd
+set [ find default=yes ] advertise-dns=yes
+/routing bfd configuration
+add addresses=10.166.106.0/24 comment=nsx-uplink-a disabled=no interfaces=vlan106 vrf=main
+add addresses=10.166.107.0/24 comment=nsx-uplink-b disabled=no interfaces=vlan107 vrf=main
+/routing bgp connection
+add as=64512 comment=edge-01-uplink-a connect=yes disabled=no instance=nsx-uplink-a local.address=10.166.106.254 .role=ebgp name=edge-01-uplink-a output.default-originate=always remote.address=10.166.106.1 .as=65500 routing-table=main use-bfd=yes vrf=main
+add as=64512 comment=edge-01-uplink-b connect=yes disabled=no instance=nsx-uplink-b local.role=ebgp name=edge-01-uplink-b output.default-originate=always remote.address=10.166.107.1 .as=65500 routing-table=main use-bfd=yes vrf=main
+add as=64512 comment=edge-02-uplink-a connect=yes disabled=no instance=nsx-uplink-a local.address=10.166.106.254 .role=ebgp name=edge-02-uplink-a remote.address=10.166.106.2 .as=65500 routing-table=main use-bfd=yes vrf=main
+add as=64512 comment=edge-02-uplink-b connect=yes disabled=no instance=nsx-uplink-b local.role=ebgp name=edge-02-uplink-b remote.address=10.166.107.2 .as=65500 use-bfd=yes
+/system clock
+set time-zone-name=Europe/London
+/system identity
+set name=fw01
+/system ntp client
+set enabled=yes
+/system ntp server
+set enabled=yes
+/system ntp client servers
+add address=0.uk.pool.ntp.org
+add address=1.uk.pool.ntp.org
+add address=2.uk.pool.ntp.org
+add address=3.uk.pool.ntp.org
+/system routerboard settings
+set enter-setup-on=delete-key
+/tool bandwidth-server
+set enabled=no
+/tool graphing interface
+add interface=wg0 store-on-disk=no
+add interface=ether1 store-on-disk=no 
