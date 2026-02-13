@@ -125,7 +125,7 @@
             "teamingPolicy": "loadbalance_loadbased",
             "activeUplinks": ["uplink1", "uplink2"],
             "standbyUplinks": null,
-            "portGroupKey": "pg-esx-mgmt"
+            "portGroupKey": "dp-esx-mgmt-v100"
         }, {
             "networkType": "VM_MANAGEMENT",
             "subnet": "10.166.101.0/24",
@@ -138,7 +138,7 @@
             "teamingPolicy": "loadbalance_loadbased",
             "activeUplinks": ["uplink1", "uplink2"],
             "standbyUplinks": null,
-            "portGroupKey": "pg-vm-mgmt"
+            "portGroupKey": "pg-vm-mgmt-v101"
         }, {
             "networkType": "VMOTION",
             "subnet": "10.166.102.0/24",
@@ -155,7 +155,7 @@
             "teamingPolicy": "loadbalance_loadbased",
             "activeUplinks": ["uplink1", "uplink2"],
             "standbyUplinks": null,
-            "portGroupKey": "pg-vmotion"
+            "portGroupKey": "pg-vmotion-v102"
         },
         {
             "networkType": "VSAN",
@@ -173,7 +173,7 @@
             "teamingPolicy": "loadbalance_srcid",
             "activeUplinks": ["uplink1", "uplink2"],
             "standbyUplinks": null,
-            "portGroupKey": "dp-vsan"
+            "portGroupKey": "dp-vsan-v103"
         }
 
     ],
@@ -206,3 +206,4 @@
         }
     ]
 }
+
