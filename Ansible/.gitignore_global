@@ -1,7 +1,0 @@
-## Configure with the following, to this before you try and push else your git cache will include the excludes and will need clearing
-## Adjust the path to suit or simply copy from the cloned repo to ~\.gitignore_global
-## git config --global core.excludesfile ~\OneDrive\Visual Studio Code\GitHub\TechCode\.gitignore_global
-## git config --global --list --show-origin
-
-# Binaries for programs and plugins
-*.exe
