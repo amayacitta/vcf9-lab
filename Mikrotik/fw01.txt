@@ -22,7 +22,6 @@ add comment="NSX Host Transport" interface=bridge mtu=9000 name=vlan104 vlan-id=
 add comment="NSX Edge Transport" interface=bridge mtu=9000 name=vlan105 vlan-id=105
 add comment="NSX Edge Uplink-A" interface=bridge name=vlan106 vlan-id=106
 add comment="NSX Edge Uplink-B" interface=bridge name=vlan107 vlan-id=107
-add comment="NSX VPC External Blocks" interface=bridge l3-hw-offloading=no name=vlan108 vlan-id=108
 /interface list
 add name=WAN
 add name=LAN
@@ -50,7 +49,7 @@ add bridge=bridge comment=defconf interface=sfp5
 /ip neighbor discovery-settings
 set discover-interface-list=all
 /interface bridge vlan
-add bridge=bridge comment=tag-all tagged=sfp-sfpplus1,sfp-sfpplus2,sfp-sfpplus3,sfp-sfpplus4,sfp1,sfp2,sfp3,sfp4,sfp5 vlan-ids=100-108
+add bridge=bridge comment=tag-all tagged=sfp-sfpplus1,sfp-sfpplus2,sfp-sfpplus3,sfp-sfpplus4,sfp1,sfp2,sfp3,sfp4,sfp5 vlan-ids=100-107
 /interface detect-internet
 set detect-interface-list=all
 /interface list member
@@ -74,7 +73,6 @@ add address=10.166.107.254/24 comment="NSX Edge Uplink-B" interface=vlan107 netw
 add address=10.166.255.1/24 comment=Wireguard interface=wg0 network=10.166.255.0
 add address=10.166.1.254/24 comment=Home interface=bridge network=10.166.1.0
 add address=192.168.178.2/24 comment=WAN interface=ether1 network=192.168.178.0
-add address=10.166.108.254/24 comment="NSX VPC External Blocks" interface=vlan108 network=10.166.108.0
 /ip dhcp-client
 add disabled=yes interface=ether1
 /ip dhcp-server
