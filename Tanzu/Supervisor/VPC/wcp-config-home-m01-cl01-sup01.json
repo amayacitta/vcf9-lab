@@ -1,0 +1,50 @@
+{
+  "specVersion": "1.0",
+  "supervisorSpec": {
+    "supervisorName": "home-m01-cl01-sup01"
+  },
+  "envSpec": {
+    "vcenterDetails": {
+      "vcenterAddress": "vc01.aclab.uk",
+      "vcenterCluster": "home-m01-cl01"
+    }
+  },
+  "tkgsComponentSpec": {
+    "tkgsMgmtNetworkSpec": {
+      "tkgsMgmtIpAssignmentMode": "DHCP",
+      "tkgsMgmtFloatingIp": "10.166.108.131",
+      "tkgsMgmtNetworkName": "tanzu-mgmt",
+      "tkgsMgmtNetworkDnsServers": [
+        "10.166.101.254"
+      ],
+      "tkgsMgmtNetworkSearchDomains": [
+        "sup01.aclab.uk"
+      ],
+      "tkgsMgmtNetworkNtpServers": [
+        "10.166.101.254"
+      ]
+    },
+    "tkgsStoragePolicySpec": {
+      "masterStoragePolicy": "home-m01-cl01 - Optimal Datastore Default Policy - RAID1",
+      "ephemeralStoragePolicy": "home-m01-cl01 - Optimal Datastore Default Policy - RAID1",
+      "imageStoragePolicy": "home-m01-cl01 - Optimal Datastore Default Policy - RAID1"
+    },
+    "nsxVpcNetworkInfo": {
+      "nsxVpcProject": "Default",
+      "nsxVpcConnectivityProfile": "Default VPC Connectivity Profile",
+      "tkgsWorkloadServiceCidr": "10.96.0.0/23",
+      "nsxVpcPrivateCidrs": [
+        "10.168.0.0/16"
+      ],
+      "nsxVpcDnsServers": [
+        "10.166.101.254"
+      ],
+      "nsxNtpDnsServers": [
+        "10.166.101.254"
+      ]
+    },
+    "controlPlaneSize": "SMALL",
+    "apiServerDnsNames": [],
+    "cpvmCount": 1
+  }
+}
