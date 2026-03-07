@@ -44,7 +44,7 @@
       ]
     },
     "controlPlaneSize": "SMALL",
-    "apiServerDnsNames": [],
+    "apiServerDnsNames": ["sup01.aclab.uk"],
     "cpvmCount": 1
   }
 }
