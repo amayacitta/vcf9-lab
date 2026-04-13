@@ -1,0 +1,32 @@
+{{- if .Values.NetworkPolicy.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "nginx-lab.fullname" . }}-deny-all-in
+  labels: {{- include "nginx-lab.labels" . | nindent 4 }}
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "nginx-lab.fullname" . }}-https-in
+  labels: {{- include "nginx-lab.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "nginx-lab.selectorLabels" . | nindent 6 }}
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - ipBlock:
+        cidr: 0.0.0.0/0
+    ports:                                                     
+    - protocol: TCP
+      port: 8443
+    - protocol: TCP
+      port: 8080
+{{- end }}

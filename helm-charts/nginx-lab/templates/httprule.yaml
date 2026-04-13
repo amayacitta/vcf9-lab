@@ -1,0 +1,21 @@
+{{- if .Values.httpRule.enabled -}}
+apiVersion: ako.vmware.com/v1beta1
+kind: HTTPRule
+metadata:
+   name: {{ include "nginx-lab.fullname" . }}-httprule
+   labels: {{- include "nginx-lab.labels" . | nindent 4 }}
+spec:
+  fqdn: {{ index .Values.hostnames 0 | required "A valid hostname is required!" | quote }}
+  paths:
+  - target: /
+    applicationPersistence: {{ .Values.httpRule.applicationPersistence | default "System-Persistence-Http-Cookie" }}
+    # healthMonitors:
+    # - my-health-monitor-1
+    # - my-health-monitor-2
+    loadBalancerPolicy:
+      algorithm: {{ .Values.httpRule.LoadBalancerPolicy.algorithm | default "LB_ALGORITHM_LEAST_CONNECTIONS" }}
+      # hash: LB_ALGORITHM_CONSISTENT_HASH_SOURCE_IP_ADDRESS
+    tls: ## This is a re-encrypt to pool
+      type: reencrypt 
+      sslProfile:  {{ .Values.httpRule.tlsProfile | default "System-Standard" }}
+{{- end -}}

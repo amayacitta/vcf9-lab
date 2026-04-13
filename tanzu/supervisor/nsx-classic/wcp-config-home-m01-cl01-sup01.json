@@ -1,0 +1,57 @@
+{
+  "specVersion": "1.0",
+  "supervisorSpec": {
+    "supervisorName": "home-m01-cl01-sup01"
+  },
+  "envSpec": {
+    "vcenterDetails": {
+      "vcenterAddress": "vc01.aclab.uk",
+      "vcenterCluster": "home-m01-cl01"
+    }
+  },
+  "tkgsComponentSpec": {
+    "tkgsMgmtNetworkSpec": {
+      "tkgsMgmtIpAssignmentMode": "STATICRANGE",
+      "tkgsMgmtNetworkName": "dp-vm-mgmt-v101",
+      "tkgsMgmtNetworkGatewayCidr": "10.166.101.254/24",
+      "tkgsMgmtNetworkStartingIp": "10.166.101.22 - 10.166.101.26",
+      "tkgsMgmtNetworkDnsServers": [
+        "10.166.101.254"
+      ],
+      "tkgsMgmtNetworkSearchDomains": [
+        "sup01.aclab.uk"
+      ],
+      "tkgsMgmtNetworkNtpServers": [
+        "10.166.101.254"
+      ]
+    },
+    "tkgsStoragePolicySpec": {
+      "masterStoragePolicy": "home-m01-cl01 - Optimal Datastore Default Policy - RAID1",
+      "ephemeralStoragePolicy": "home-m01-cl01 - Optimal Datastore Default Policy - RAID1",
+      "imageStoragePolicy": "home-m01-cl01 - Optimal Datastore Default Policy - RAID1"
+    },
+    "tkgsNcpClusterNetworkInfo": {
+      "tkgsClusterDistributedSwitch": "home-m01-cl01-vds01",
+      "tkgsNsxEdgeCluster": "home-m01-edge-clu01",
+      "tkgsNsxTier0Gateway": "home-m01-t0-parent",
+      "tkgsRoutedMode": true,
+      "tkgsNamespaceSubnetPrefix": "28",
+      "tkgsNamespaceNetworkCidrs": [
+        "10.167.0.0/16"
+      ],
+      "tkgsIngressCidrs": [
+        "10.168.0.0/24"
+      ],
+      "tkgsEgressCidrs": [],
+      "tkgsWorkloadDnsServers": [
+        "10.166.101.254"
+      ],
+      "tkgsWorkloadServiceCidr": "10.96.0.0/23"
+    },
+    "controlPlaneSize": "SMALL",
+    "apiServerDnsNames": [
+      "sup01.aclab.uk"
+    ],
+    "cpvmCount": 1
+  }
+}

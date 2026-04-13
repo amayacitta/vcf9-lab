@@ -1,0 +1,273 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    app.aclab.uk/instance: development
+    app.aclab.uk/managed-by: kubectl
+    app.aclab.uk/owner: guesswho
+    app.aclab.uk/project: tanzu-poc
+    app.aclab.uk/business-unit: department1
+    app.aclab.uk/backup: enabled
+  name: app01-dev
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-index-html
+  namespace: app01-dev
+  labels:
+    app.aclab.uk/name: nginx-web-example-01    # labels for the resource
+    app.aclab.uk/instance: development
+    app.aclab.uk/version: "1.0.0"
+    app.aclab.uk/component: web
+    app.aclab.uk/part-of: example
+    app.aclab.uk/managed-by: kubectl
+    app.aclab.uk/owner: guesswho
+    app.aclab.uk/project: tanzu-poc
+    app.aclab.uk/business-unit: department1
+    app.aclab.uk/confidentiality: official
+    app.aclab.uk/compliance: none
+    app.aclab.uk/backup: enabled
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <title>Welcome to nginx!</title>
+    <style>
+    html { color-scheme: light dark; }
+    body { width: 35em; margin: 0 auto;
+    font-family: Tahoma, Verdana, Arial, sans-serif; }
+    </style>
+    </head>
+    <body>
+    <h1>App for department 1!</h1>
+    <p>If you see this page, the nginx web server is successfully installed and
+    working. Further configuration is required.</p>
+
+    <p>For online documentation and support please refer to
+    <a href="http://nginx.org/">nginx.org</a>.<br/>
+    Commercial support is available at
+    <a href="http://nginx.com/">nginx.com</a>.</p>
+
+    <p><em>Thank you for using nginx.</em></p>
+    </body>
+    </html>
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: nginx-example-01-sa
+  namespace: app01-dev
+  labels:
+    app.aclab.uk/name: nginx-web-example-01    # labels for the resource
+    app.aclab.uk/instance: development
+    app.aclab.uk/version: "1.0.0"
+    app.aclab.uk/component: web
+    app.aclab.uk/part-of: example
+    app.aclab.uk/managed-by: kubectl
+    app.aclab.uk/owner: guesswho
+    app.aclab.uk/project: tanzu-poc
+    app.aclab.uk/business-unit: department1
+    app.aclab.uk/confidentiality: official
+    app.aclab.uk/compliance: none
+    app.aclab.uk/backup: enabled
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-example-01-svc
+  namespace: app01-dev
+  labels:
+    app.aclab.uk/name: nginx-web-example-01    # labels for the resource
+    app.aclab.uk/instance: development
+    app.aclab.uk/version: "1.0.0"
+    app.aclab.uk/component: web
+    app.aclab.uk/part-of: example
+    app.aclab.uk/managed-by: kubectl
+    app.aclab.uk/owner: guesswho
+    app.aclab.uk/project: tanzu-poc
+    app.aclab.uk/business-unit: department1
+    app.aclab.uk/confidentiality: official
+    app.aclab.uk/compliance: none
+    app.aclab.uk/backup: enabled
+spec:
+  ports:
+  - protocol: TCP
+    port: 80             # port exposed by the service, where the ingress will connect to
+    targetPort: 8080      # port on the pod where the application is listening
+  type: ClusterIP
+  selector:
+    app.aclab.uk/name: nginx-web-example-01    # these must match the labels on deployment.spec.template.metadata.labels to associate the service with the deployed pods
+    app.aclab.uk/instance: development         # can be any or all of them as long as they match, more added is more specific
+    # app.aclab.uk/version: "1.0.0"
+    # app.aclab.uk/component: web
+    # app.aclab.uk/part-of: example
+    # app.aclab.uk/managed-by: kubectl
+    # app.aclab.uk/owner: guesswho
+    # app.aclab.uk/project: tanzu-poc
+    # app.aclab.uk/business-unit: department1
+    # app.aclab.uk/confidentiality: official
+    # app.aclab.uk/compliance: none
+    # app.aclab.uk/backup: enabled
+---
+## Create statefulSet with three replicas
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-example-01
+  namespace: app01-dev
+  labels:
+    app.aclab.uk/name: nginx-web-example-01    # labels for the resource
+    app.aclab.uk/instance: development
+    app.aclab.uk/version: "1.0.0"
+    app.aclab.uk/component: web
+    app.aclab.uk/part-of: example
+    app.aclab.uk/managed-by: kubectl
+    app.aclab.uk/owner: guesswho
+    app.aclab.uk/project: tanzu-poc
+    app.aclab.uk/business-unit: department1
+    app.aclab.uk/confidentiality: official
+    app.aclab.uk/compliance: none
+    app.aclab.uk/backup: enabled
+spec:
+  replicas: 2       ## will auto scale up to 3 when cpu hits 80%
+  selector:
+    matchLabels:
+      app.aclab.uk/name: nginx-web-example-01    # these must match the labels on deployment.metadata.labels
+      app.aclab.uk/instance: development
+      app.aclab.uk/version: "1.0.0"
+      app.aclab.uk/component: web
+      app.aclab.uk/part-of: example
+      app.aclab.uk/managed-by: kubectl
+      app.aclab.uk/owner: guesswho
+      app.aclab.uk/project: tanzu-poc
+      app.aclab.uk/business-unit: department1
+      app.aclab.uk/confidentiality: official
+      app.aclab.uk/compliance: none
+      app.aclab.uk/backup: enabled
+  template:
+    metadata:
+      labels:
+        app.aclab.uk/name: nginx-web-example-01    # labels for the resources (pods created by deployment)
+        app.aclab.uk/instance: development
+        app.aclab.uk/version: "1.0.0"
+        app.aclab.uk/component: web
+        app.aclab.uk/part-of: example
+        app.aclab.uk/managed-by: kubectl
+        app.aclab.uk/owner: guesswho
+        app.aclab.uk/project: tanzu-poc
+        app.aclab.uk/business-unit: department1
+        app.aclab.uk/confidentiality: official
+        app.aclab.uk/compliance: none
+        app.aclab.uk/backup: enabled
+    spec:
+        securityContext: 
+          seccompProfile:
+            type: RuntimeDefault        # set of security defaults while preserving the functionality of the workload
+          runAsNonRoot: true
+        serviceAccount: nginx-example-01-sa
+        serviceAccountName: nginx-example-01-sa
+        affinity:                                             # anti-affinity to stop pods being scheduled on same node
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                - key: app.aclab.uk/business-unit
+                  operator: In
+                  values:
+                  - department1
+              topologyKey: "kubernetes.io/hostname"
+        containers:
+        - name: nginx
+          securityContext:
+            runAsUser: 101        # non-root user in the nginx image, can find by doing 'id nginx' in the container
+            runAsGroup: 101       # non-root group in the nginx image
+            allowPrivilegeEscalation: false     # ability to escalate privileges is denied for all capabilities
+            capabilities:
+              drop:
+              - ALL
+          image: nginxinc/nginx-unprivileged:alpine3.23-perl  # unprivileged nginx image which runs as nginx user, not root
+          resources:
+            requests:
+              memory: "128Mi"   # attempt to schedule the pod on a node that has at least this much memory
+              cpu: "500m"       # attempt to schedule the pod on a node that has at least 0.5 core of a CPU
+            limits:
+              memory: "1Gi"     # allow pod to use up to 1Gi of memory. Once this is reached the pod will be be killed with an OOM condition and restarted.
+              cpu: "1"          # allow pod to use up to half a cpu core, once this is reached the pod will be throttled.
+          volumeMounts:
+          - name: nginx-index-html
+            mountPath: /usr/share/nginx/html/index.html
+            subPath: index.html
+        volumes:
+          - name: nginx-index-html
+            configMap:
+              name: nginx-index-html
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: nginx-example-01-hpa
+  namespace: app01-dev
+  labels:
+    app.aclab.uk/name: nginx-web-example-01    # labels for the resource
+    app.aclab.uk/instance: development
+    app.aclab.uk/version: "1.0.0"
+    app.aclab.uk/component: web
+    app.aclab.uk/part-of: example
+    app.aclab.uk/managed-by: kubectl
+    app.aclab.uk/owner: guesswho
+    app.aclab.uk/project: tanzu-poc
+    app.aclab.uk/business-unit: department1
+    app.aclab.uk/confidentiality: official
+    app.aclab.uk/compliance: none
+    app.aclab.uk/backup: enabled
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nginx-example-01
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 80
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: nginx-example-01-pdb
+  namespace: app01-dev
+  labels:
+    app.aclab.uk/name: nginx-web-example-01    # labels for the resource
+    app.aclab.uk/instance: development
+    app.aclab.uk/version: "1.0.0"
+    app.aclab.uk/component: web
+    app.aclab.uk/part-of: example
+    app.aclab.uk/managed-by: kubectl
+    app.aclab.uk/owner: guesswho
+    app.aclab.uk/project: tanzu-poc
+    app.aclab.uk/business-unit: department1
+    app.aclab.uk/confidentiality: official
+    app.aclab.uk/compliance: none
+    app.aclab.uk/backup: enabled
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.aclab.uk/name: nginx-web-example-01    # these must match the labels on the deployment
+      app.aclab.uk/instance: development
+      app.aclab.uk/version: "1.0.0"
+      app.aclab.uk/component: web
+      app.aclab.uk/part-of: example
+      app.aclab.uk/managed-by: kubectl
+      app.aclab.uk/owner: guesswho
+      app.aclab.uk/project: tanzu-poc
+      app.aclab.uk/business-unit: department1
+      app.aclab.uk/confidentiality: official
+      app.aclab.uk/compliance: none
+      app.aclab.uk/backup: enabled

@@ -1,0 +1,18 @@
+apiVersion: cert-manager.io/v1 
+kind: Certificate
+metadata:
+  name: {{ include "nginx-lab.fullname" . }}-cert
+  labels:
+    {{- include "nginx-lab.labels" . | nindent 4 }}
+spec:
+  privateKey:
+    rotationPolicy: Always
+  commonName: {{ index .Values.hostnames 0 | required "A valid hostname is required!" | quote }}
+  dnsNames:
+    {{- range .Values.hostnames }}
+      - {{ . }}
+        {{- end }}
+  secretName: {{ include "nginx-lab.fullname" . }}-tls-secret
+  issuerRef:
+    name: {{ required "A valid ClusterIssuer is required!" .Values.certmanager.ClusterIssuer }}
+    kind: ClusterIssuer

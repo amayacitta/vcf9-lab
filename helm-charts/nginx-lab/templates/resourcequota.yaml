@@ -1,0 +1,14 @@
+{{- if .Values.NetworkPolicy.enabled -}}
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: {{ include "nginx-lab.fullname" . }}-resourcequota
+  labels: {{- include "nginx-lab.labels" . | nindent 4 }}
+spec:
+  hard:
+    requests.storage: {{ .Values.resourceQuota.hard.requests.storage | quote }}
+    requests.cpu: {{ .Values.resourceQuota.hard.requests.cpu | quote }}
+    requests.memory: {{ .Values.resourceQuota.hard.requests.memory | quote }}
+    limits.cpu: {{ .Values.resourceQuota.hard.limits.cpu | quote }}
+    limits.memory: {{ .Values.resourceQuota.hard.limits.memory | quote }}
+{{- end -}}

@@ -1,0 +1,210 @@
+## podCIDR is within the private VPC subnet with /24 per node, and is reached via NSX load balancer
+## static routes exist in NSX to the podCIDRs via eth0 of the nodes
+## these are NOT advertised outside of the VPC as they are private subnets
+apiVersion: addons.kubernetes.vmware.com/v1alpha1
+kind: AddonConfig
+metadata:
+  annotations:
+    clusteraddon.addons.kubernetes.vmware.com/owned-for-deletion: "true"
+  labels:
+    # addon.kubernetes.vmware.com/addon-name: antrea        ## documentation says to add but this is rejected when applied
+    # cluster.x-k8s.io/cluster-name: aclab-vks-02           ## documentation says to add but this is rejected when applied
+  name: aclab-vks-02-antrea
+spec:
+  # clusterName: aclab-vks-02                               ## documentation says to add but this is rejected when applied
+  values:
+    antrea:
+      config:
+        trafficEncapMode: noEncap
+        noSNAT: true
+---
+apiVersion: cpi.tanzu.vmware.com/v1alpha1
+kind: VSphereCPIConfig
+metadata:
+  name: aclab-vks-02-vsphere-cpi-package
+spec:
+  vsphereCPI:
+    antreaNSXPodRoutingEnabled: true
+    insecure: false
+    mode: vsphereParavirtualCPI
+    nsxVPC:
+      podIPPoolType: Private
+    tlsCipherSuites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+---
+apiVersion: cluster.x-k8s.io/v1beta2
+kind: Cluster
+metadata:
+  name: aclab-vks-02
+spec:
+  clusterNetwork:
+    services:
+      cidrBlocks: ["10.100.0.0/16"]
+    # pods:
+    #  cidrBlocks: ["10.101.0.0/16"]    ## disable for routable pods
+    serviceDomain: cluster.local
+  topology:
+    classRef:
+      name: builtin-generic-v3.6.0
+      namespace: vmware-system-vks-public 
+    version: v1.35.0+vmware.2-vkr.4
+    controlPlane:
+      replicas: 1
+      variables:
+        overrides:
+        - name: vmClass
+          value: best-effort-small
+    workers:
+      machineDeployments:
+        - name: nodepool-01
+          class: node-pool
+          replicas: 1
+    variables:
+      - name: bootstrapAddons
+        value:
+          cniRef:
+            name: antrea
+            namespace: vmware-system-vks-public
+      - name: vmClass
+        value: best-effort-small
+      - name: storageClass
+        value: home-m01-cl01-optimal-datastore-default-policy-raid1
+      - name: node
+        value:
+          labels:
+            org: aclab
+            location: home
+        value:
+          firewall:
+            inboundRules:
+              # array of firewall rules, defaults arready include ssh but is left here as an example
+              - protocol: tcp
+                source: "0.0.0.0/0"
+                fromPort: 22
+                toPort: 22
+      - name: kubernetes
+        value:
+          certificateRotation:
+            enabled: true
+            renewalDaysBeforeExpiry: 90
+      - name: volumes
+        value:
+          ## add more space for kubelet, etcd, containerd etc.
+        - name: containerd-override
+          mountPath: /var/lib/containerd
+          storageClass: home-m01-cl01-optimal-datastore-default-policy-raid1
+          capacity: 50Gi
+        - name: kubelet-override
+          mountPath: /var/lib/kubelet
+          storageClass: home-m01-cl01-optimal-datastore-default-policy-raid1
+          capacity: 50Gi
+      - name: osConfiguration
+        value:
+          ntp:
+            servers:
+            - 10.166.101.254
+          fips:
+            enabled: false
+          trust: 
+            additionalTrustedCAs:
+              - caCert:
+                # add root certs so nodes have proper ca-trust, can also add harbor root cert here
+                  content: |-
+                    -----BEGIN CERTIFICATE-----
+                    MIIE/TCCAuWgAwIBAgIQRZgG3OMe9JBIvOazkbSGNjANBgkqhkiG9w0BAQsFADAR
+                    MQ8wDQYDVQQDEwZSb290Q0EwHhcNMjYwNDAxMjAzMzQ5WhcNNDYwNDAxMjA0MzQ5
+                    WjARMQ8wDQYDVQQDEwZSb290Q0EwggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIK
+                    AoICAQDIMF1LNgFLNKFlaA9rHQNaafEDf7nH4d8WMG56PECA80zykoCoRiLEG1gN
+                    F3ix4FLvI5xmNiiOiymU0zrkrC4i3ZjEi14LBRKdNPivLU6CNsyJDrMQMmBGSZKy
+                    NDTK72nFSCIZffTBDK8twxjVkt9V6BPKZHNDKMkNxfp7oJ5n0cpw1H4GbZETS8I4
+                    DcTOQW16bbld1Wi8Tk3UJXogvaFGH4y+ki1WuRmyYAk/8fBk04phqdXCITwxrLN8
+                    5Jv969lo4TznIekq5Q/3sUavQMw80AaX++d0U7PYeffHwaZ4J+BZREeVsthzs58V
+                    KxZzvfEesaAabuho9jCcLnXn02oIkXXpigyrbEYnhlnw8docRzD5S+AAKRO4tOys
+                    iW5he8pKVprYSqqlZee9YmsboUZG+qF1cEsgy4GvjafgjQSSTFx9/pOxHbMskDqW
+                    vqk1CYzfzRGymb3IuHm8bwhK/4fbtxvll0LYv56fh/q+MptszFdZBnn5A+49Z6xP
+                    thBCWhKeup1DUg0UTf4W7eg3ak3AcVNQEUNZmSy6Vv+Ud28o/3A5ZKkmEs1UVA1X
+                    a0rnIIpeYkKl/knW6cVsJpw/cCOrWU7KkMHIsLtTjTQ6k2YZLO1aSNpg4KxVOWMT
+                    DW8Hifss90gS7IGuthW5C/VotCQxM3X57o3NkprLZ0RMuhOELQIDAQABo1EwTzAL
+                    BgNVHQ8EBAMCAYYwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUk+n/hum5ZHz2
+                    lMmQ8zz6jFLFsx4wEAYJKwYBBAGCNxUBBAMCAQAwDQYJKoZIhvcNAQELBQADggIB
+                    ACrgIGWYcJqyl2NX7RrCwbF4mzV4hXCvIh7EqFgvkQAMXYfhY/5ZJ+RuVb/JWDYm
+                    RBYlCKis93zcKMOqajFHhdRUfiKGc1AGtgDZ66quexFwEI0UQwl+yDUhB9A3fUKj
+                    idNz8eaHb0UtWu451HRKegZdvtHofsjcMQ73uM68kHfjolIHgnvjNr+mxGs5zSCr
+                    Kpsm4LHg7cGNzVCNNpQt8HD+AnoGEaJHbP5mASSXs7mn15y89ihAAYMNvg4GputZ
+                    hW4dYzkCRZBtxPD0B8g1JLntjGFEZb4n86v/ACZ32k5iudu7dlUlVNDJ7BszAKIK
+                    tr+I54ZG34yyH3o+bYLxOGYK1gRdSYnlr9gU1Bx1GCc/Jp7UDmqnZKpoNlhmfRor
+                    /cVZKgWKaquDqFjQMeGLC7fpP+90VKcEcai42Uc8oC8Av0k5gADngI6yEKjGKi5L
+                    XN/R5crW9VcwNO5HsW3uUWhyGox4P62tqp75qtaIPlNDowbaY8V2ZFZanKrXvgyN
+                    Z61jyXpk/5cZ112CPDKlari6YxppXsWfv7C31akc9Y+TYeiX+yvYNMPoXR2YpSlV
+                    fmkWifBC+RTFWMYzXsQeeLOXkqiSV6NP/He35EfqPyROR7EoXMQcrJVICYz1fMCh
+                    UzL6A7aXBUY2vBVmk3U7UecoXG+28z/tmeyCzAdNCVGz
+                    -----END CERTIFICATE-----
+                    -----BEGIN CERTIFICATE-----
+                    MIIGFjCCA/6gAwIBAgITeQAAAAMehVtzOJjm1QAAAAAAAzANBgkqhkiG9w0BAQsF
+                    ADARMQ8wDQYDVQQDEwZSb290Q0EwHhcNMjYwNDAxMjAzNDQzWhcNMzYwNDAxMjA0
+                    NDQzWjBRMRIwEAYKCZImiZPyLGQBGRYCdWsxFTATBgoJkiaJk/IsZAEZFgVhY2xh
+                    YjEUMBIGCgmSJomT8ixkARkWBGNvcnAxDjAMBgNVBAMTBVN1YjAxMIICIjANBgkq
+                    hkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAvSFTbVYPc3THPXg2j6XZm/cnIOffpxEC
+                    vIk3ZRXwYr1Gvg+t4YG64sIxPEPUeAKjJ+eoytmtMzVmYSM09ldXldgstnfnCmsj
+                    SJqeViD/4wPgFoau7tZCIh8OFemm/Pa1at5STYtDp82XM/78nf6rnUNoUe8zcfrB
+                    Xq3x8BjJrnTeuV8w4zwqZej354l/mDWLO6rYRsGyU7vqine8RiIKMT22TWVEzmOg
+                    +gxOx2DiaCczOa9Dwl+AAnJbJvPv/I2zNgyRy4Wqj89FNwaksWx0Su1PqNw79FBv
+                    n8em2zJJDe76f8rLx271D/+3LTbQhc4EF79MBeDHiMRu0vTZk8V4n09uXVohCMa+
+                    A/Gr2jrykTqSzP0gMW7qHdsmGE329h7ZF0M6dQTpYISjekHuNDexTo+Y+nCBTB7g
+                    fV9sk1m/rlao4YS4/BoubwFEnc1nkU4bZbAoaXWb5DC7wDJ4gFCG9FYbvIjjyy33
+                    5OuVsdRZnMAN6XB9R5YjWfXLE8GQ6R6XpzBBbAWZf30LG2c+98mS78WZtS1SwN0Y
+                    Ll6ENoFhizQB504ISzj4qmLZJRT1uuaosshJ0dhIOkZVhe9zAe0GmCpM2+JtH7Mi
+                    0FvMkr9XH4o496jhM2hxyC7nAGF8H9Fn74pP7bORUFNArJIApRCIAERAjMHckqVv
+                    G2uRH+1isT0CAwEAAaOCASUwggEhMBAGCSsGAQQBgjcVAQQDAgEAMB0GA1UdDgQW
+                    BBQjwo+wJuYTiBUfMsEG9IOkzW1hxTAZBgkrBgEEAYI3FAIEDB4KAFMAdQBiAEMA
+                    QTALBgNVHQ8EBAMCAYYwDwYDVR0TAQH/BAUwAwEB/zAfBgNVHSMEGDAWgBST6f+G
+                    6blkfPaUyZDzPPqMUsWzHjA/BgNVHR8EODA2MDSgMqAwhi5odHRwOi8vY3JsLmNv
+                    cnAuYWNsYWIudWsvQ2VydEVucm9sbC9Sb290Q0EuY3JsMFMGCCsGAQUFBwEBBEcw
+                    RTBDBggrBgEFBQcwAoY3aHR0cDovL2NydC5jb3JwLmFjbGFiLnVrL0NlcnRFbnJv
+                    bGwvcm9vdGNhMDFfUm9vdENBLmNydDANBgkqhkiG9w0BAQsFAAOCAgEAsFTJ4ghh
+                    SQIM00pxLxrQQOEJ7RpW6sUVlxRbZ+dzlHP6d81gsrX7bQKbYcALwltFDtrAdGvz
+                    1GkXLtXCUWr0bLkMUxfM4WAwin4bzRkNLNoVa0z6erti8pVlZBMEKWzCr7U/MHe/
+                    bsixz5n/eXzDDrHhMYkmRoLaWRALPDKD6Q3ZVbbWPm2vQYbgjV7/bt6UJ9+wRP36
+                    ggQKmnBDguQiSNYjO6zKyX9fcSI2QYZBAq8aP+zaD3M9xE4U9VAoS8LPzl6A9pWH
+                    54sAQUjqhubxqHhw9kDtnJHspK5DCD3dJ8KNNt/eN/+mOT8Cv7N/x3z3kVet+w6I
+                    395SMko14kfLVRkL+hFWW/H5VLGCeFhkr0h78H7e+8AKR5mXHQJJemaOg30+K7Ew
+                    MM926xnn9pI53FH3jwTDzjGl1We/2CjK4qoDYl1ibCcSj9jvn68EgM2WFsmgOEDC
+                    RsjVFpF+8DVg94PASdZXD81dELvYTay4qXax4aSJAwn8Sl7xqNTZdaF6eE/ypLk1
+                    fpgajGXIU0aoAXjFokeRxtJS3rwlrp3qs2YDQCWOMkHHlZFlkVjZYMfis91iJsZT
+                    9YBMusSWGLAgznP4I70aayiOIC+dTtRIvK4awwFHbs+L+G/RLhLRnP5n6vaYCO2L
+                    XlLn4774US3zX2sutHwY02UKqaEnIUieouI=
+                    -----END CERTIFICATE-----
+                    -----BEGIN CERTIFICATE-----
+                    MIIGAzCCA+ugAwIBAgITeQAAAAUsNJ/0ub8bFAAAAAAABTANBgkqhkiG9w0BAQsF
+                    ADARMQ8wDQYDVQQDEwZSb290Q0EwHhcNMjYwNDA3MjA1MDIyWhcNMzYwNDA3MjEw
+                    MDIyWjBQMQswCQYDVQQGEwJVSzENMAsGA1UECBMESG9tZTENMAsGA1UEBxMEaG9t
+                    ZTEOMAwGA1UEChMFQUNMQUIxEzARBgNVBAMTClRhbnp1U3ViMDEwggIiMA0GCSqG
+                    SIb3DQEBAQUAA4ICDwAwggIKAoICAQDUWVzyTNvYO06qFGHCu+Pz002xVlWAhiq0
+                    Rfg1Va/3XhacQguCLdw/y0Ujr2itG7tlIcDVhubsrDcSgiX0GHtnhInv20z/m1G5
+                    MenMaL5xpka10sTzpMydZhYlqu5JMAU44HndKyI46jNsJJjhRhv3l1mAVQGUH+er
+                    xo3w0iZLsPQZoUCMgWAjZV3OfaJ0wLXCBDxqJCDstCEE55n5ZfgfjI0U2TZOrk2q
+                    e1td7AubNHviRjJDB/HNsMT4rTX3mXhoW1g5Ntt340KUl9wU2wA/swaKthjKPP5V
+                    zkx/FveNWI40eqo7p20sj8XQxM/JOt7im3t9Ao5XGwctKzNtcp9597wG2wA4a3CO
+                    dfyJ2YId32HLhkeh26G4gYOk4oDUln0WeleqoiolXToUrkGL9W7wnyGPM8xQpGhA
+                    egrd3UGzvoGXofDnNc9NR3JSSp4gaOfeb4oHHIzS75yp9y5kmt7yGK/E7i23+l+H
+                    /p5pO9syV1iX5RCcz2BekyblO5u6+b9arJdS+Bwd+BtS5taOy6Tpw/MDEoEflHVW
+                    Aa/N0E7iDxn6VPWOUmvshsHudOZVAkfqnGmKAFZKUcBcXYxHq8huXYFSNFeyq5Yj
+                    O8wiJ8/4bEM9cgdlXyKDYti8ZdjAfsHzXU62+5ot1n3Teb8xXlgos6ZumMTV7HON
+                    ZpYnCoRGWQIDAQABo4IBEzCCAQ8wGQYJKwYBBAGCNxQCBAweCgBTAHUAYgBDAEEw
+                    HQYDVR0OBBYEFFyrWb91Auafs9o53oMszEEtb63uMB8GA1UdIwQYMBaAFJPp/4bp
+                    uWR89pTJkPM8+oxSxbMeMD8GA1UdHwQ4MDYwNKAyoDCGLmh0dHA6Ly9jcmwuY29y
+                    cC5hY2xhYi51ay9DZXJ0RW5yb2xsL1Jvb3RDQS5jcmwwUwYIKwYBBQUHAQEERzBF
+                    MEMGCCsGAQUFBzAChjdodHRwOi8vY3J0LmNvcnAuYWNsYWIudWsvQ2VydEVucm9s
+                    bC9yb290Y2EwMV9Sb290Q0EuY3J0MA8GA1UdEwEB/wQFMAMBAf8wCwYDVR0PBAQD
+                    AgGGMA0GCSqGSIb3DQEBCwUAA4ICAQBSTw0+iMv3jQH1k5j470C4DarmnudBMiKg
+                    PK5v9ZNubAIAhMkdrk1UZI5z4erSO+B1Enma3VchoqCKexr4Zyak/wL5ScGC3CNh
+                    elwlhp/UWKV8s2U6h2YdsVYKIYmSOi3WlmCvOexXFcVnuG6OlNqjh3zyuYFIxCck
+                    6gURFe9kFFqkd/6udhvW7yv5Cb312pdIkm5s7rw/x6Tz7jUm7IXNwZ0K+xm7pGwJ
+                    IpSMaQbl9mWEiV7AH4t+K/FVUb4MQaCBCaYN2y721n1XXv9yyYtMl1naVmOui+mr
+                    skiEwI/09dyv0EdzrDDbdOHNJubAifnuF6Bvw2D5i+MGYWFv+t6zxVJcL4ntdEzT
+                    v/plDgx3+zdRdjwUryEjpY1Z+WWSesJSgdtDsELRm+B333xAJfwtjU4dWK2ydJKj
+                    oW2zyWmTNGIigkLVZWH5hQCzXWhNKEYzdX9GdXkK+W95MrLhbwWMZ/WhKc6B8j8N
+                    4T2h57yNJdSSdO3FgFrgzfZhk0wv6HTXaHS1bobAn3wExZKLPGf4x0FuAkFH1tfE
+                    uFJ3QbgTJceh4CZphl82CmUWxMhF1rMR4TQsJ8DO5n31CC0ODKk3pO2U8Eimt33x
+                    ZC43yJxCWrYZSV1wPKtskxCP4N+QYAkVoXzKv6AKiwefnVDncbOcVhU18pPF1SsF
+                    Mnz9hgR+UQ==
+                    -----END CERTIFICATE-----

@@ -1,0 +1,13 @@
+{{- if .Values.LimitRange.enabled -}}
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: {{ include "nginx-lab.fullname" . }}-limitrange
+  labels: {{- include "nginx-lab.labels" . | nindent 4 }}
+spec:
+  limits:
+  - defaultRequest:
+      cpu: {{ .Values.LimitRange.limits.defaultRequest.cpu }}
+      memory: {{ .Values.LimitRange.limits.defaultRequest.memory }}
+    type: Container
+{{- end -}}

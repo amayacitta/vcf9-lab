@@ -1,0 +1,77 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "nginx-lab.fullname" . }}-default-conf
+  labels:
+    {{- include "nginx-lab.labels" . | nindent 4 }}
+data:
+  default.conf: |
+    server {
+        listen 8080;
+        listen 8443 ssl;
+        http2 on;
+        server_name {{ .Values.hostnames | join " " }};
+
+        ssl_certificate /etc/nginx/ssl/tls.crt;
+        ssl_certificate_key /etc/nginx/ssl/tls.key;
+        ssl_session_timeout 1d;
+        ssl_session_cache shared:SharedNixCraftSSL:10m; 
+        ssl_session_tickets off;
+
+        # TLS 1.2 and 1.3 only
+        ssl_protocols TLSv1.2 TLSv1.3;
+        ssl_prefer_server_ciphers off;
+
+        # HSTS (ngx_http_headers_module is required) (63072000 seconds)
+        add_header Strict-Transport-Security "max-age=63072000" always;
+
+        #access_log  /var/log/nginx/host.access.log  main;
+
+        location / {
+            root   /usr/share/nginx/html;
+            index  index.html index.htm;
+        }
+
+        location = /pink {
+            return 302 "https://{{ index .Values.hostnames 0 }}/pink/";
+        }
+
+        location /pink/ {
+            root   /usr/share/nginx/html;
+            try_files /index.html =404;
+        }
+
+        location = /blue {
+            return 302 "https://{{ index .Values.hostnames 0 }}/blue/";
+        }
+
+        location /blue/ {
+            root   /usr/share/nginx/html;
+            try_files /index.html =404;
+        }
+
+        location = /green {
+            return 302 "https://{{ index .Values.hostnames 0 }}/green/";
+        }
+
+        location /green/ {
+            root   /usr/share/nginx/html;
+            try_files /index.html =404;
+        }
+
+        #error_page  404              /404.html;
+
+        # redirect server error pages to the static page /50x.html
+        #
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   /usr/share/nginx/html;
+        }
+
+        location = /healthz {
+                access_log off;
+                add_header 'Content-Type' 'application/json';
+                return 200 '{"status":"UP"}';
+        }
+
+    }

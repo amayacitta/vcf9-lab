@@ -1,0 +1,32 @@
+{{- if .Values.httpRoute.enabled -}}
+## if you place the secret in a different namespace to the gateway, a reference grant is required - https://gateway-api.sigs.k8s.io/api-types/referencegrant/
+## reference grants to not work with AVI AKO currently
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: {{ include "nginx-lab.fullname" . }}-gateway
+  annotations:
+    external-dns.alpha.kubernetes.io/target: {{ .Values.externaldns.target | quote }}
+spec:
+  gatewayClassName: {{ .Values.ingress.className }}
+  listeners:
+  ## general http listener
+  - name: {{ include "nginx-lab.fullname" . }}-http-listener
+    port: 80
+    protocol: HTTP
+    allowedRoutes:
+      namespaces:
+        from: Same
+  ## https listener
+  - name: {{ include "nginx-lab.fullname" . }}-https-listener
+    port: 443
+    protocol: HTTPS
+    allowedRoutes:
+      namespaces:
+        from: Same
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - kind: Secret
+        name: {{ include "nginx-lab.fullname" . }}-tls-secret
+{{ end -}}

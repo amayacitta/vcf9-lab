@@ -1,0 +1,51 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "nginx-lab.fullname" . }}-root-pdb
+  labels:
+    {{- include "nginx-lab.labels" . | nindent 8 }}
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.aclab.uk/component: root
+      {{- include "nginx-lab.selectorLabels" . | nindent 6 }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "nginx-lab.fullname" . }}-pink-pdb
+  labels:
+    {{- include "nginx-lab.labels" . | nindent 8 }}
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.aclab.uk/component: pink
+      {{- include "nginx-lab.selectorLabels" . | nindent 6 }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "nginx-lab.fullname" . }}-blue-pdb
+  labels:
+    {{- include "nginx-lab.labels" . | nindent 8 }}
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.aclab.uk/component: blue
+      {{- include "nginx-lab.selectorLabels" . | nindent 6 }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "nginx-lab.fullname" . }}-green-pdb
+  labels:
+    {{- include "nginx-lab.labels" . | nindent 8 }}
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.aclab.uk/component: green
+      {{- include "nginx-lab.selectorLabels" . | nindent 6 }}
