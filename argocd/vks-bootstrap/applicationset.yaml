@@ -13,7 +13,7 @@ spec:
             repoURL: https://github.com/amayacitta/vcf9-lab.git
             revision: HEAD
             directories:
-            - path: argocd/region01-apps/*
+            - path: argocd/vks-bootstrap/region01-apps/*
         - clusters:    
             selector:
               matchLabels:
@@ -31,7 +31,6 @@ spec:
       destination:
         server: '{{.server}}'
         namespace: '{{index .path.segments 1}}'
-
       syncPolicy:
         syncOptions:
           - CreateNamespace=true  
