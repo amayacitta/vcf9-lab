@@ -22,7 +22,7 @@ spec:
 {{ end }}             
   template:      
     metadata:
-      name: {{ printf "{{ (split \":\" .name)._0 }}-{{index .path.segments 3}}" | quote }}
+      name: {{ printf "{{ (split \":\" .name)._0 }}-{{index .path.segments 2}}" | quote }}
     spec:
       project: {{ .Values.argocd.applicationset.project }}
       source:
@@ -34,7 +34,7 @@ spec:
             - {{ .Values.argocd.vksclusters.region01.helmValuesFile }}
       destination:
         server: {{ printf "{{.server}}" | quote }}
-        namespace: {{ printf "{{index .path.segments 3}}" | quote }}
+        namespace: {{ printf "{{index .path.segments 2}}" | quote }}
 {{- with .Values.argocd.applicationset.syncPolicy }}
       syncPolicy:
 {{ toYaml . | indent 8 -}}

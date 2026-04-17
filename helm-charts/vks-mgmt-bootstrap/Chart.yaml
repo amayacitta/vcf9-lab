@@ -1,5 +1,5 @@
 apiVersion: v2
-name: vks-bootstrap
+name: vks-mgmt-bootstrap
 description: A bootstrap Helm chart for a VKS management cluster
 
 # A chart can be either an 'application' or a 'library' chart.
