@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: region01-apps
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+  - matrix:
+      generators:
+        - git:
+            repoURL: https://github.com/amayacitta/vcf9-lab.git
+            revision: HEAD
+            directories:
+            - path: argocd/region01-apps/*
+        - clusters:    
+            selector:
+              matchLabels:
+                type: "workload"     
+                region: "region01"                     
+  template:      
+    metadata:
+      name: '{{index .path.segments 1}}-{{.name}}'     
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/amayacitta/vcf9-lab.git
+        targetRevision: HEAD
+        path: '{{.path.path}}'
+      destination:
+        server: '{{.server}}'
+        namespace: '{{index .path.segments 1}}'
+
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true  
+        automated: 
+          prune: true
+          selfHeal: true 

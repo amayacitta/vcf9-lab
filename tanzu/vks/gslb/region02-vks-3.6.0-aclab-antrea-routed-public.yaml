@@ -9,10 +9,10 @@ metadata:
     clusteraddon.addons.kubernetes.vmware.com/owned-for-deletion: "true"
   labels:
     # addon.kubernetes.vmware.com/addon-name: antrea        ## documentation says to add but this is rejected when applied
-    # cluster.x-k8s.io/cluster-name: aclab-vks-01           ## documentation says to add but this is rejected when applied
-  name: aclab-vks-01-antrea
+    # cluster.x-k8s.io/cluster-name: aclab-vks-02           ## documentation says to add but this is rejected when applied
+  name: aclab-vks-02-antrea
 spec:
-  # clusterName: aclab-vks-01                               ## documentation says to add but this is rejected when applied
+  # clusterName: aclab-vks-02                               ## documentation says to add but this is rejected when applied
   values:
     antrea:
       config:
@@ -22,7 +22,7 @@ spec:
 apiVersion: cpi.tanzu.vmware.com/v1alpha1
 kind: VSphereCPIConfig
 metadata:
-  name: aclab-vks-01-vsphere-cpi-package
+  name: aclab-vks-02-vsphere-cpi-package
 spec:
   vsphereCPI:
     antreaNSXPodRoutingEnabled: true
@@ -35,7 +35,7 @@ spec:
 apiVersion: cluster.x-k8s.io/v1beta2
 kind: Cluster
 metadata:
-  name: aclab-vks-01
+  name: aclab-vks-02
 spec:
   clusterNetwork:
     services:
@@ -66,7 +66,7 @@ spec:
                 labels:
                   org: aclab
                   env: lab
-                  location: home
+                  region: region02
     variables:
       - name: bootstrapAddons
         value:

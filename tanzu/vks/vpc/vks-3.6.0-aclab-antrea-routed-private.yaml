@@ -46,7 +46,7 @@ spec:
     classRef:
       name: builtin-generic-v3.6.0
       namespace: vmware-system-vks-public 
-    version: v1.35.0+vmware.2-vkr.4
+    version: v1.35.2+vmware.1-vkr.3
     controlPlane:
       replicas: 1
       variables:
@@ -58,6 +58,14 @@ spec:
         - name: nodepool-01
           class: node-pool
           replicas: 1
+          variables:
+            overrides:
+            - name: node
+              value:
+                labels:
+                  org: aclab
+                  env: lab
+                  location: home
     variables:
       - name: bootstrapAddons
         value:
@@ -69,10 +77,6 @@ spec:
       - name: storageClass
         value: home-m01-cl01-optimal-datastore-default-policy-raid1
       - name: node
-        value:
-          labels:
-            org: aclab
-            location: home
         value:
           firewall:
             inboundRules:
