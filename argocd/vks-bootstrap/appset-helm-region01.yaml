@@ -21,7 +21,7 @@ spec:
                 region: "region01"                     
   template:      
     metadata:
-      name: '{{index .path.segments 3}}'
+      name: '{{ (split ":" .name)._0 }}-{{index .path.segments 3}}'
     spec:
       project: default
       source:
