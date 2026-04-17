@@ -24,6 +24,6 @@ appVersion: "1.0"
 
 # chart dependencies
 dependencies:
-  - name: avi-ako
+  - name: ako
     version: 2.1.3
     repository: oci://projects.packages.broadcom.com/ako/helm-charts
