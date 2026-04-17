@@ -28,6 +28,9 @@ spec:
         repoURL: https://github.com/amayacitta/vcf9-lab.git
         targetRevision: HEAD
         path: '{{.path.path}}'
+        helm:
+          valueFiles:
+            - values.yaml
       destination:
         server: '{{.server}}'
         namespace: '{{index .path.segments 3}}'
