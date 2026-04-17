@@ -12,9 +12,55 @@ certmanager:
     publickey: ""
     privatekey: ""
 
-argo-cd:
+argocd:
   enabled: true
+  vksclusters:
+    region01:
+      enabled: true
+      applicationsetname: vks-bootstrap-region01
+      helmValuesFile: values-region01.yaml
+      selector:
+        matchLabels:
+          type: "workload"     
+          region: "region01"
+    region02:
+      enabled: false
+      applicationsetname: vks-bootstrap-region02
+      helmValuesFile: values-region02.yaml
+      selector:
+        matchLabels:
+          type: "workload"     
+          region: "region02"
+  applicationset:
+    namespace: argocd
+    project: default
+    git:
+      repoURL: https://github.com/amayacitta/vcf9-lab.git
+      path: argocd/vks-bootstrap/*
+      targetRevision: HEAD
+    # syncPolicy configuration for the ApplicationSet template, applied to all generated Applications
+    syncPolicy:
+      syncOptions:
+      - CreateNamespace=true
+      automated: 
+        prune: true
+        selfHeal: true
+      # add pss baseline labels to the namespaces created by this ApplicationSet
+      managedNamespaceMetadata:
+        labels:
+          pod-security.kubernetes.io/enforce: baseline
+      # enable retry logic for application syncs
+      retry:
+        limit: 5 
+        backoff:
+          duration: 5s 
+          factor: 2 
+          maxDuration: 3m 
+  
+  # force argo to go into this namespace, rather than the one specified in the helm install
+  # allows the use of a dependant subchart
   namespaceOverride: "argocd"
+  
   global:
     # -- Default domain used by all components
     ## Used for ingresses, certificates, SSO, notifications, etc.

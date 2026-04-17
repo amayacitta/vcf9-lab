@@ -1,3 +1,9 @@
+vksclusters:
+  region01:
+    enabled: true
+  region02:
+    enabled: false
+
 external-dns:
   provider:
     name: rfc2136

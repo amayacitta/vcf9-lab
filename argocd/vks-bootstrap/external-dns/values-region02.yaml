@@ -1,0 +1,66 @@
+vksclusters:
+  region01:
+    enabled: false
+  region02:
+    enabled: true
+
+external-dns:
+  provider:
+    name: rfc2136
+
+  # include production domains which we will use for cname aliasing to the avi dns service
+  domainFilters:
+    - aclab.uk
+
+  # exclude domains which are delgated to the avi dns service
+  excludeDomains:
+    - avi.aclab.uk
+
+  # assign text record which is has specific tagging for the region and cluster
+  registry: txt
+  txtPrefix: "region01-aclab-vks-01-%{record_type}."
+  txtOwnerId: "region01-aclab-vks-01"
+
+  env:
+    - name: KRB_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: externaldns-kerberos-password
+          key: KRB_PASSWORD
+
+  # perform full sync including deletion
+  policy: sync
+
+  # sync every 30 seconds
+  interval: 0m30s
+
+  extraArgs:
+    ## insecure
+    # - --rfc2136-insecure
+    ## common
+    - --rfc2136-load-balancing-strategy=round-robin
+    - --rfc2136-host=dc01.corp.aclab.uk
+    - --rfc2136-port=53
+    - --rfc2136-zone=aclab.uk
+    - --rfc2136-tsig-axfr
+    # secure
+    - --rfc2136-gss-tsig
+    - --rfc2136-kerberos-username=svc_externaldns
+    - --rfc2136-kerberos-password=$(KRB_PASSWORD)
+    - --rfc2136-kerberos-realm=CORP.ACLAB.UK
+    - --rfc2136-tsig-secret-alg=hmac-sha256
+
+  sources:
+    - ingress
+    - gateway-httproute
+
+  extraVolumes:
+    - name: kerberos-config-volume 
+      configMap:
+        defaultMode: 420
+        name: krb5.conf
+
+  extraVolumeMounts: 
+    - name: kerberos-config-volume
+      mountPath: /etc/krb5.conf
+      subPath: krb5.conf
