@@ -4,7 +4,7 @@ vksclusters:
   region02:
     enabled: false
 
-avi-ako:
+ako:
   featureGates:
     GatewayAPI: true
     EnablePrometheus: true
