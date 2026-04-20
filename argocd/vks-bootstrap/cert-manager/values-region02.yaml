@@ -1,3 +1,11 @@
+## parent chart values
+certmanager:
+  enabled: true
+  ClusterIssuer:
+    name: ""
+    secretName: ""
+
+## subchart values
 cert-manager:
   crds:
     enabled: true

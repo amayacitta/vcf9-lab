@@ -1,3 +1,10 @@
+## parent chart values
+certmanager:
+  enabled: true
+  ClusterIssuer:
+    name: tanzu-sub01-clusterissuer
+
+## subchart values
 cert-manager:
   crds:
     enabled: true

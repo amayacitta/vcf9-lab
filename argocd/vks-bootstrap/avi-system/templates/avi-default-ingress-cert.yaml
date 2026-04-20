@@ -3,8 +3,6 @@ kind: Certificate
 metadata:
   name: avi-default-ingress-cert
   namespace: avi-system
-  annotations:
-    argocd.argoproj.io/sync-wave: "-2"
 spec:
   commonName: "*.avi.aclab.uk"
   dnsNames:
