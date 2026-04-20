@@ -4,8 +4,6 @@ kind: ClusterIssuer
 metadata:
   name: {{.Values.certmanager.ClusterIssuer.name | default "tanzu-sub01-clusterissuer" }}
   namespace: cert-manager
-  annotations:
-    argocd.argoproj.io/sync-wave: "-2"
 spec:
   ca:
     secretName: {{ .Values.certmanager.ClusterIssuer.secretName | default "tanzu-sub01-tls-secret" }}
