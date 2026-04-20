@@ -1,8 +1,16 @@
+## regional deployment flags
+vksclusters:
+  region01:
+    enabled: true
+  region02:
+    enabled: false
+
 ## parent chart values
 certmanager:
   enabled: true
   ClusterIssuer:
-    name: tanzu-sub01-clusterissuer
+    name: ""
+    secretName: ""
 
 ## subchart values
 cert-manager:

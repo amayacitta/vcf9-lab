@@ -1,3 +1,10 @@
+## regional deployment flags
+vksclusters:
+  region01:
+    enabled: false
+  region02:
+    enabled: true
+
 ## parent chart values
 certmanager:
   enabled: true
