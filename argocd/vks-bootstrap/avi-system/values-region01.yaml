@@ -116,7 +116,13 @@ amko:
   image:
     repository: ako.avi.packages.broadcom.com/ako/amko:2.1.1
     pullPolicy: IfNotPresent
-    
+
+  serviceDiscovery:
+    # image repository
+    image:
+      repository: projects.registry.vmware.com/ako/amko-service-discovery
+      pullPolicy: IfNotPresent
+
   # Configs related to AMKO Federator
   federation:
     # cluster context where AMKO is going to be deployed
