@@ -16,7 +16,7 @@ spec:
             directories:
             - path: {{ .Values.argocd.applicationset.git.path }}
         - clusters:    
-{{- with .Values.argocd.vksclusters.region01.selector }} 
+{{- with .Values.argocd.vksclusters.region02.selector }} 
             selector:
 {{ toYaml . | indent 14 -}}
 {{ end }}                    

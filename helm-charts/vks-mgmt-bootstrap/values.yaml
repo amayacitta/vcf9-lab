@@ -25,7 +25,7 @@ argocd:
           type: "workload"     
           region: "region01"
     region02:
-      enabled: false
+      enabled: true
       applicationsetname: vks-bootstrap-region02
       helmValuesFile: values-region02.yaml
       selector:
