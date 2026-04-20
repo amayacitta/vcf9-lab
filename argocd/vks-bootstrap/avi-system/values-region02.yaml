@@ -114,7 +114,7 @@ amko:
   enabled: true
 
   image:
-    repository: ako.avi.packages.broadcom.com/ako/amko:2.1.1
+    repository: ako.avi.packages.broadcom.com/ako/amko
     pullPolicy: IfNotPresent
 
   # Configs related to AMKO Federator
@@ -132,7 +132,7 @@ amko:
   # Configs related to Multi-cluster ingress. Note: MultiClusterIngress is a tech preview.
   multiClusterIngress:
     enable: false
-    
+
   configs:
     gslbLeaderController: ''
     controllerVersion: 31.1.1

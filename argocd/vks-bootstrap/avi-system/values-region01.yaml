@@ -114,7 +114,7 @@ amko:
   enabled: true
   
   image:
-    repository: ako.avi.packages.broadcom.com/ako/amko:2.1.1
+    repository: ako.avi.packages.broadcom.com/ako/amko
     pullPolicy: IfNotPresent
 
   # Configs related to AMKO Federator
