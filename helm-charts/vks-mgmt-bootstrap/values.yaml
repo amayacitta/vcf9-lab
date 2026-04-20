@@ -8,6 +8,7 @@ certmanager:
   secretName: ""
   ClusterIssuer: 
     name: ""
+    secretName: ""
     # intentionally left blank, has to be set by helm --set
     publickey: ""
     privatekey: ""

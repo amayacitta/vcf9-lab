@@ -6,5 +6,5 @@ metadata:
   namespace: cert-manager
 spec:
   ca:
-    secretName: {{ .Values.certmanager.ClusterIssuer.name | default "tanzu-sub01-tls-secret" }}
+    secretName: {{ .Values.certmanager.ClusterIssuer.secretName | default "tanzu-sub01-tls-secret" }}
 {{ end -}}
