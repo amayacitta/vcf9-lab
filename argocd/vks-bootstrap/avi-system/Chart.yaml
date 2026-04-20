@@ -27,3 +27,6 @@ dependencies:
   - name: ako
     version: 2.1.3
     repository: oci://projects.packages.broadcom.com/ako/helm-charts
+  - name: amko
+    version: 2.1.1
+    repository: oci://projects.packages.broadcom.com/ako/helm-charts
