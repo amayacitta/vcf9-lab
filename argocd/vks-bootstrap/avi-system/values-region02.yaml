@@ -112,6 +112,11 @@ ako:
 
 amko:
   enabled: true
+  
+  image:
+    repository: ako.avi.packages.broadcom.com/ako/amko:2.1.1
+    pullPolicy: IfNotPresent
+
   # Configs related to AMKO Federator
   federation:
     # cluster context where AMKO is going to be deployed
