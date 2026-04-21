@@ -142,7 +142,7 @@ amko:
   globalDeploymentPolicy:
     appSelector:
       label:
-        gslb: enabled
+        app.aclab.uk/backup: enabled
 
     # list of all clusters that the GDP object will be applied to, can take any/all values
     # from .configs.memberClusters
