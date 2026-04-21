@@ -27,7 +27,7 @@ externaldns:
 # the first hostname is the primary production FQDN for the application and is the only one that will be attached to external-dns
 # for the CNAME target please change externaldns.target
 hostnames:
-  - application01.aclab.uk
+  - app01-lab.gslb.avi.aclab.uk
   - app01-lab.gslb.avi.aclab.uk
 
 # cluster issuer reference for certificate manager
