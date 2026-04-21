@@ -29,4 +29,6 @@ dependencies:
     repository: oci://projects.packages.broadcom.com/ako/helm-charts
   - name: amko
     version: 2.1.1
-    repository: oci://projects.packages.broadcom.com/ako/helm-charts
+    repository: oci://registry-1.docker.io/amayacitta
+    # # removed as the current chart does not allow secrets to be attached for controller logins
+    # repository: oci://projects.packages.broadcom.com/ako/helm-charts
