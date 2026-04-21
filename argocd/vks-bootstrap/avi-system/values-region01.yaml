@@ -137,9 +137,7 @@ amko:
     - clusterContext: avi-amko-sa@aclab-vks-02
     refreshInterval: 1800
     logLevel: DEBUG
-    useCustomGlobalFqdn: false
-    domainNames:
-    - gslb.avi.aclab.uk
+    useCustomGlobalFqdn: true
 
   # gslbLeaderCredentials:
   # Disabled in favour of gslb-avi-secret within avi-system namespace
