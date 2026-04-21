@@ -149,12 +149,6 @@ amko:
     - cluster: avi-amko-sa@aclab-vks-01
     - cluster: avi-amko-sa@aclab-vks-02
 
-    # list of all clusters that the GDP object will be applied to, can take any/all values
-    # from .configs.memberClusters
-    matchClusters:
-    - cluster: avi-amko-sa@aclab-vks-01
-    - cluster: avi-amko-sa@aclab-vks-02
-
     # list of all clusters and their traffic weights, if unspecified, default weights will be
     # given (optional). Uncomment below to add the required trafficSplit.
     # trafficSplit:
