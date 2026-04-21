@@ -11,6 +11,6 @@ rules:
   resources: ["ingresses", "ingresses/status"]
   verbs: ["get", "list", "watch"]
 - apiGroups: ["amko.vmware.com"]
-  resources: ["gslbconfig", "globaldeploymentpolicies"]
+  resources: ["gslbconfig", "globaldeploymentpolicies", "hostrules"]
   verbs: ["create", "get", "list", "watch", "update", "delete"]
 {{ end -}}
