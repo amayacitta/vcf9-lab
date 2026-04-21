@@ -5,7 +5,7 @@ metadata:
   name: avi-amko-role
 rules:
 - apiGroups: [""]
-  resources: ["services"]
+  resources: ["services","namespaces"]
   verbs: ["get", "list", "watch"]
 - apiGroups: ["networking.k8s.io"]
   resources: ["ingresses", "ingresses/status"]
