@@ -10,7 +10,7 @@ global:
     app.aclab.uk/confidentiality: public
     app.aclab.uk/compliance: none
     app.aclab.uk/backup: disabled
-    app.aclab.uk/backup: enabled
+    app.aclab.uk/gslb: enabled
 
 # external dns control for the application which is hard set with annotations only, ignoring the usual spec
 # the primary .hostnames will be used as the CNAME DNS record creation
