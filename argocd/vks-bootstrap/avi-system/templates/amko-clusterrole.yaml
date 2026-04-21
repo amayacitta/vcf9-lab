@@ -10,7 +10,10 @@ rules:
 - apiGroups: ["networking.k8s.io"]
   resources: ["ingresses", "ingresses/status"]
   verbs: ["get", "list", "watch"]
+- apiGroups: ["ako.vmware.comm"]
+  resources: ["hostrules"]
+  verbs: ["list"]
 - apiGroups: ["amko.vmware.com"]
-  resources: ["gslbconfig", "globaldeploymentpolicies", "hostrules", "amkoclusters"]
+  resources: ["gslbconfig", "globaldeploymentpolicies", "amkoclusters"]
   verbs: ["create", "get", "list", "watch", "update", "delete"]
 {{ end -}}
