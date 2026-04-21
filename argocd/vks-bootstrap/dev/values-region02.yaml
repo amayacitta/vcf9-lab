@@ -1,0 +1,268 @@
+vksclusters:
+  region01:
+    enabled: false
+  region02:
+    enabled: true
+
+nginx-lab:
+  # Default values file for test application nginx-lab from amayacitta.co.uk
+
+  # global labels to be applied to all resources more information can be found here: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  # these are tied to nginx-lab.labels
+  global:
+    labels:
+      app.aclab.uk/owner: amayacitta
+      app.aclab.uk/project: blog
+      app.aclab.uk/business-unit: home
+      app.aclab.uk/confidentiality: public
+      app.aclab.uk/compliance: none
+      app.aclab.uk/backup: disabled
+      app.aclab.uk/gslb: enabled
+
+  # external dns control for the application which is hard set with annotations only, ignoring the usual spec
+  # the primary .hostnames will be used as the CNAME DNS record creation
+  # i.e. hostnames index 0 > externaldns.target
+  # or in other words application01.aclab.uk will CNAME > app01-lab.avi.aclab.uk
+  externaldns:
+    target: "app01-lab.gslb.avi.aclab.uk"
+    ttl: 30
+
+  # hostnames for certificates, httprules and ingresses or httpRoutes depending on which is enabled
+  # for certificates the first entry becomes the common name and all others become additional alternative subject names
+  # for ingress a single virtual server will be created, use AKO CRD hostrules to add additional hostnames to the same virtual server as aliases
+  # for httproute a single virtual server will be created with multiple hostnames
+  # the first hostname is the primary production FQDN for the application and is the only one that will be attached to external-dns
+  # for the CNAME target please change externaldns.target
+  hostnames:
+    - app01-lab.gslb.avi.aclab.uk
+    - app01-lab.gslb.avi.aclab.uk
+
+  # cluster issuer reference for certificate manager
+  certmanager:
+    ClusterIssuer: tanzu-sub01-clusterissuer
+
+  # Resource quota
+  resourceQuota:
+    # Enable automatic resource quota creation
+    enabled: true
+    # Resource quota name (defaults to Release.Name)
+    name: []
+    # Resource spec
+    hard:
+      requests:
+        storage: "20Gi"
+        cpu: "2"
+        memory: "1Gi"
+      limits:
+        cpu: "10"
+        memory: "10Gi"
+
+  # Limit range for the namespace, this will set default resource requests and limits for the pods in the namespace. More information can be found here: https://kubernetes.io/docs/concepts/policy/limit-range/
+  LimitRange:
+    # toggle on or off
+    enabled: true
+    # LimitRange spec
+    limits:
+      defaultRequest:
+        cpu: "100m"
+        memory: "128Mi"
+
+  # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
+  replicaCount: 1
+
+  # This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
+  image:
+    repository: nginxinc/nginx-unprivileged:alpine3.23-perl
+    # This sets the pull policy for images.
+    pullPolicy: IfNotPresent
+
+  # This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  imagePullSecrets: []
+  # This is to override the chart name.
+  nameOverride: ""
+  fullnameOverride: ""
+
+  # This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Automatically mount a ServiceAccount's API credentials?
+    automount: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  # This is for setting Kubernetes Annotations to a Pod.
+  # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  podAnnotations: {}
+
+  podSecurityContext: {}
+
+  securityContext:
+    seccompProfile:
+      type: RuntimeDefault
+    runAsNonRoot: true
+    runAsUser: 101
+    runAsGroup: 101
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+      - ALL
+
+  # This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
+  service:
+    # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
+    type: ClusterIP
+    # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
+    port: 443
+
+  # This block is for AVI AKO http rule enablement
+  # To use this disable passthrough mode in the ingress annotations
+  httpRule:
+    enabled: true
+    # specify to control tls procotols and ciphers, the profile will need to be manually created on the AVI and referenced here
+    # if none is specified the System-Standard profile on the AVI will be used
+    tlsProfile: {}
+    # specify the perisistence method for the application, defaults to http cookies
+    applicationPersistence: {}
+    # specify what load balancing algorithm to use, defaults to least connections
+    LoadBalancerPolicy:
+      algorithm: {}
+
+  # This block is for HostRule configurations used to create aliases for additional hostnames
+  # Allows multiple hostnames to attach to a single ingress 
+  HostRule:
+    enabled: true
+    # specify the waf policy to be used, if not set will default to System-WAF-Policy
+    wafPolicy: {}
+
+  # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
+  ingress:
+    enabled: true
+    className: "avi-lb"
+    annotations: {}
+      # passthrough.ako.vmware.com/enabled: "true"
+    rules:
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+          - path: /pink
+            pathType: Prefix
+          - path: /blue
+            pathType: Prefix
+          - path: /green
+            pathType: Prefix
+
+  # Expose the service via gateway-api HTTPRoute
+  # Requires Gateway API resources and suitable controller installed within the cluster
+  # (see: https://gateway-api.sigs.k8s.io/guides/)
+  httpRoute:
+    # HTTPRoute enabled.
+    enabled: false
+    # common back end port
+    backendPort: 443
+    # HTTPRoute annotations.
+    annotations: {}
+    # Which Gateways this Route is attached to.
+    parentRefs:
+    - name: app01-aclab-nginx-gateway
+      sectionName: app01-aclab-nginx-https-listener
+    # List of rules and filters applied.
+    rules:
+    - matches:
+      - path:
+          type: PathPrefix
+          value: /
+      backendRefs:
+      - name: app01-aclab-nginx-root-svc
+    - matches:
+      - path:
+          type: PathPrefix
+          value: /pink
+      backendRefs:
+      - name: app01-aclab-nginx-pink-svc
+    - matches:
+      - path:
+          type: PathPrefix
+          value: /blue
+      backendRefs:
+      - name: app01-aclab-nginx-blue-svc
+    - matches:
+      - path:
+          type: PathPrefix
+          value: /green
+      backendRefs:
+      - name: app01-aclab-nginx-green-svc
+
+  resources: 
+    # Constrain how much resource can be used by the applications in the namespace
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  # This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+  startupProbe:
+    httpGet:
+      path: /healthz
+      port: 8080
+    failureThreshold: 18    # grants 3 minutes for the application to start (18*10/60), Liveness and Readiness are disabled until this completes.
+    periodSeconds: 10       # probe runs every 10 seconds.
+    successThreshold: 1     # requires 1 consecutive success for the probe to be considered successful.
+    timeoutSeconds: 1       # if no response within 1 second, the probe is considered failed.
+  livenessProbe:
+    httpGet:
+      path: /healthz
+      port: 8080
+    initialDelaySeconds: 3      # kicks in after the startupProbe and readinessProbe. Will wait for 3 seconds before performing the first check.
+    periodSeconds: 10           # probe runs every 10 seconds.
+    successThreshold: 1         # requires 1 consecutive success for the probe to be considered successful.
+    timeoutSeconds: 1           # if no response within 1 second, the probe is considered failed and is restart by kubelet.
+  readinessProbe:
+    exec:
+      command:
+      - cat
+      - /etc/nginx/conf.d/default.conf  # kicks in after the startupProbe. Checks the config file is present, if not the pod will not start, once started the livenessProbe takes over.
+    initialDelaySeconds: 5
+    periodSeconds: 5
+
+  # This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 1
+    targetCPUUtilizationPercentage: 80
+
+  # Additional volumes 
+  volumes: {}
+
+  # Additional volumeMounts 
+  volumeMounts: {}
+
+  # node selectors
+  nodeSelector: {}
+
+  # taint tollerations
+  tolerations: {}
+
+  # affinity rules for pod scheduling more information can be found here: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: app
+            operator: In
+            values:
+            - store
+        topologyKey: "kubernetes.io/hostname"
+
+  # network policy for the application more information can be found here: https://kubernetes.io/docs/concepts/services-networking/network-policies/
+  NetworkPolicy:
+    # Enable automatic network policy creation, this will block all ingress and only allow specific ports for the application
+    enabled: true
