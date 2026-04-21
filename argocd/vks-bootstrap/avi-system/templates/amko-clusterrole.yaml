@@ -10,7 +10,7 @@ rules:
 - apiGroups: ["networking.k8s.io"]
   resources: ["ingresses", "ingresses/status"]
   verbs: ["get", "list", "watch"]
-- apiGroups: ["ako.vmware.comm"]
+- apiGroups: ["ako.vmware.com"]
   resources: ["hostrules"]
   verbs: ["list"]
 - apiGroups: ["amko.vmware.com"]
