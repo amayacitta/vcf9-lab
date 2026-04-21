@@ -2,18 +2,15 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: avi-amko
+  name: avi-amko-role
 rules:
 - apiGroups: [""]
   resources: ["services"]
   verbs: ["get", "list", "watch"]
-- apiGroups: ["networking.k8s.io/v1"]
-  resources: ["ingresses"]
+- apiGroups: ["networking.k8s.io"]
+  resources: ["ingresses", "ingresses/status"]
   verbs: ["get", "list", "watch"]
-- apiGroups: ["networking.k8s.io/v1"]
-  resources: ["ingresses"]
-  verbs: ["get", "list", "watch"]
-- apiGroups: ["avilb.k8s.io/v1alpha1"]
-  resources: ["GSLBConfig", "GlobalDeploymentPolicy"]
+- apiGroups: ["amko.vmware.com"]
+  resources: ["gslbconfig", "globaldeploymentpolicies"]
   verbs: ["create", "get", "list", "watch", "update", "delete"]
 {{ end -}}

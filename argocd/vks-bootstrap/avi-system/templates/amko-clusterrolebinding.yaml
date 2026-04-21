@@ -1,0 +1,14 @@
+{{- if .Values.amko.enabled }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: avi-amko-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: avi-amko-role
+subjects:
+- kind: ServiceAccount
+  name: avi-amko-sa
+  namespace: avi-system
+{{ end -}}
