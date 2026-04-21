@@ -111,7 +111,7 @@ ako:
     #     -----END CERTIFICATE-----
 
 amko:
-  enabled: false
+  enabled: true
   
   # Configs related to AMKO Federator
   federation:
