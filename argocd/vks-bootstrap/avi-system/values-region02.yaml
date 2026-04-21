@@ -133,7 +133,7 @@ amko:
     - clusterContext: avi-amko-sa@aclab-vks-01
     - clusterContext: avi-amko-sa@aclab-vks-02
     refreshInterval: 1800
-    logLevel: INFO
+    logLevel: DEBUG
     useCustomGlobalFqdn: true
 
   # gslbLeaderCredentials:
