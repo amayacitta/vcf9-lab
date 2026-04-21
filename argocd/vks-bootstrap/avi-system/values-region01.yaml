@@ -148,7 +148,9 @@ amko:
     # from .configs.memberClusters
     matchClusters:
     - cluster: avi-amko-sa@aclab-vks-01
+      syncVipOnly: true
     - cluster: avi-amko-sa@aclab-vks-02
+      syncVipOnly: true
 
     # list of all clusters and their traffic weights, if unspecified, default weights will be
     # given (optional). Uncomment below to add the required trafficSplit.
