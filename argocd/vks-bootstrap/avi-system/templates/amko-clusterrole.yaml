@@ -12,7 +12,7 @@ rules:
   verbs: ["get", "list", "watch"]
 - apiGroups: ["ako.vmware.com"]
   resources: ["hostrules"]
-  verbs: ["list"]
+  verbs: ["watch","list"]
 - apiGroups: ["amko.vmware.com"]
   resources: ["gslbconfig", "globaldeploymentpolicies", "amkoclusters"]
   verbs: ["create", "get", "list", "watch", "update", "delete"]
