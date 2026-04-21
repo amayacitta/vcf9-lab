@@ -141,7 +141,7 @@ amko:
 
   globalDeploymentPolicy:
     appSelector:
-      gslb: enabled
+      avi: gslb
 
     # list of all clusters that the GDP object will be applied to, can take any/all values
     # from .configs.memberClusters
