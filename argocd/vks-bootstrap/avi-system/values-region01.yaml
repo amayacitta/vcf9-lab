@@ -113,10 +113,6 @@ ako:
 amko:
   enabled: true
   
-  # image:
-  #   repository: ako.avi.packages.broadcom.com/ako/amko
-  #   pullPolicy: IfNotPresent
-
   # Configs related to AMKO Federator
   federation:
     # cluster context where AMKO is going to be deployed
@@ -129,12 +125,8 @@ amko:
     - avi-amko-sa@aclab-vks-01
     - avi-amko-sa@aclab-vks-02
 
-  # Configs related to Multi-cluster ingress. Note: MultiClusterIngress is a tech preview.
-  multiClusterIngress:
-    enable: false
-
   configs:
-    gslbLeaderController: ''
+    gslbLeaderController: "10.166.101.27"
     controllerVersion: 31.1.1
     tenant: admin
     memberClusters:
@@ -142,38 +134,14 @@ amko:
     - clusterContext: avi-amko-sa@aclab-vks-02
     refreshInterval: 1800
     logLevel: INFO
-    # Set the below flag to true if a different GSLB Service fqdn is desired than the ingress/route's
-    # local fqdns. Note that, this field will use AKO's HostRule objects' to find out the local to global
-    # fqdn mapping. To configure a mapping between the local to global fqdn, configure the hostrule
-    # object as:
-    # [...]
-    # spec:
-    #  virtualhost:
-    #    fqdn: foo.avi.com
-    #    gslb:
-    #      fqdn: gs-foo.avi.com
     useCustomGlobalFqdn: true
 
-  # Disabled in favour of sealed secret
-  # gslb-avi-secret within avi-system namespace
-  # gslbLeaderCredentials:
-  #   username: ""
-  #   password: ""
+  gslbLeaderCredentials: {}
+  # Disabled in favour of gslb-avi-secret within avi-system namespace
 
   globalDeploymentPolicy:
-    # appSelector takes the form of:
-    # appSelector:
-    #   label:
-    #     app: gslb   <example label key-value for an ingress/service type LB>
-    # Uncomment below and add the required ingress/route/service label
-    # appSelector:
-
-    # namespaceSelector takes the form of:
-    # namespaceSelector:
-    #   label:
-    #     ns: gslb   <example label key-value for namespace>
-    # Uncomment below and add the reuqired namespace label
-    # namespaceSelector:
+    appSelector:
+      gslb: enabled
 
     # list of all clusters that the GDP object will be applied to, can take any/all values
     # from .configs.memberClusters
@@ -233,12 +201,3 @@ amko:
     # downResponse:
     #   type:
     #   fallbackIP:         # required only for type == GSLB_SERVICE_DOWN_RESPONSE_FALLBACK_IP
-
-  serviceAccount:
-    # Specifies whether a service account should be created
-    create: true
-    # Annotations to add to the service account
-    annotations: {}
-    # The name of the service account to use.
-    # If not set and create is true, a name is generated using the fullname template
-    name:
