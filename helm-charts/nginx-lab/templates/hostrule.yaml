@@ -9,6 +9,8 @@ spec:
   virtualhost:
     fqdn: {{ index .Values.hostnames 0 | required "A valid hostname is required!" | quote }}
     fqdnType: Exact
+    gslb:
+      fqdn: app01-lab.gslb.aclab.uk
     enableVirtualHost: true
     # tls: # optional
     #   sslKeyCertificate:
