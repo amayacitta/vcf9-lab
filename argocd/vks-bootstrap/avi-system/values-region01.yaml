@@ -154,9 +154,11 @@ amko:
     #      fqdn: gs-foo.avi.com
     useCustomGlobalFqdn: true
 
-  gslbLeaderCredentials:
-    username: 'admin'
-    password: 'passw0rd123'
+  # Disabled in favour of sealed secret
+  # gslb-avi-secret within avi-system namespace
+  # gslbLeaderCredentials:
+  #   username: ""
+  #   password: ""
 
   globalDeploymentPolicy:
     # appSelector takes the form of:
