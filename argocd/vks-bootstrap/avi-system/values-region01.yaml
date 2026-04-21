@@ -137,7 +137,7 @@ amko:
     - clusterContext: avi-amko-sa@aclab-vks-02
     refreshInterval: 1800
     logLevel: DEBUG
-    useCustomGlobalFqdn: true
+    useCustomGlobalFqdn: false
 
   # gslbLeaderCredentials:
   # Disabled in favour of gslb-avi-secret within avi-system namespace
