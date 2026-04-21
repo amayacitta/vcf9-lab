@@ -1,0 +1,14 @@
+{{- if .Values.amko.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: amko-pvc
+  namespace : avi-system
+spec:
+  storageClassName: home-m01-cl01-optimal-datastore-default-policy-raid1
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+{{ end -}}

@@ -113,6 +113,11 @@ ako:
 amko:
   enabled: true
 
+  # add 10gb persistent volume claim for logs
+  persistentVolumeClaim: amko-pvc
+  mountPath: "/log"
+  logFile: "amko.log"
+
   # Configs related to AMKO Federator
   federation:
     # cluster context where AMKO is going to be deployed
