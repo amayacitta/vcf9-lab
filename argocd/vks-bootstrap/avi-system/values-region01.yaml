@@ -138,6 +138,8 @@ amko:
     refreshInterval: 1800
     logLevel: DEBUG
     useCustomGlobalFqdn: false
+    domainNames:
+    - gslb.avi.aclab.uk
 
   # gslbLeaderCredentials:
   # Disabled in favour of gslb-avi-secret within avi-system namespace

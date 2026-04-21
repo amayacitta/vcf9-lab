@@ -23,7 +23,7 @@ global:
 # i.e. hostnames index 0 > externaldns.target
 # or in other words application01.aclab.uk will CNAME > app01-lab.avi.aclab.uk
 externaldns:
-  target: "app01-lab.avi.aclab.uk"
+  target: "app01-lab.gslb.aclab.uk"
   ttl: 30
 
 # hostnames for certificates, httprules and ingresses or httpRoutes depending on which is enabled
@@ -33,8 +33,8 @@ externaldns:
 # the first hostname is the primary production FQDN for the application and is the only one that will be attached to external-dns
 # for the CNAME target please change externaldns.target
 hostnames:
-  - app01-lab.avi.aclab.uk
-  - app01-lab.avi.aclab.uk
+  - app01-lab.gslb.aclab.uk
+  - app01-lab.gslb.aclab.uk
 
 # cluster issuer reference for certificate manager
 certmanager:
