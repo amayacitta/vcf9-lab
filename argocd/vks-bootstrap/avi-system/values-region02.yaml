@@ -136,7 +136,7 @@ amko:
     logLevel: INFO
     useCustomGlobalFqdn: true
 
-  gslbLeaderCredentials: {}
+  # gslbLeaderCredentials:
   # Disabled in favour of gslb-avi-secret within avi-system namespace
 
   globalDeploymentPolicy:
