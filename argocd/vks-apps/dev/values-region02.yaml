@@ -24,7 +24,7 @@ aclab-nginx:
   # i.e. hostnames index 0 > externaldns.target
   # or in other words application01.aclab.uk will CNAME > app01-lab.avi.aclab.uk
   externaldns:
-    target: "application01.gslb.avi.aclab.uk"
+    target: "application01.gslb.aclab.uk"
     ttl: 30
 
   # hostnames for certificates, httprules and ingresses or httpRoutes depending on which is enabled
