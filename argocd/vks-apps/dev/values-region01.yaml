@@ -36,6 +36,7 @@ aclab-nginx:
   hostnames:
     - application01.aclab.uk
     - app01-lab.avi.aclab.uk
+    - application01.gslb.avi.aclab.uk
 
   # cluster issuer reference for certificate manager
   certmanager:
