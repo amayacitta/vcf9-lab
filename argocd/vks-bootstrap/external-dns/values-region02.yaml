@@ -2,7 +2,7 @@ vksclusters:
   region01:
     enabled: false
   region02:
-    enabled: false
+    enabled: true
 
 external-dns:
   provider:
@@ -19,8 +19,8 @@ external-dns:
 
   # assign text record which is has specific tagging for the region and cluster
   registry: txt
-  txtPrefix: "region01-aclab-vks-01-%{record_type}."
-  txtOwnerId: "region01-aclab-vks-01"
+  txtPrefix: "region01-aclab-vks-02-%{record_type}."
+  txtOwnerId: "region01-aclab-vks-02"
 
   env:
     - name: KRB_PASSWORD
