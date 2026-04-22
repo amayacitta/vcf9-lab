@@ -4,7 +4,7 @@ vksclusters:
   region02:
     enabled: true
 
-nginx-lab:
+aclab-nginx:
   # Default values file for test application nginx-lab from amayacitta.co.uk
 
   # global labels to be applied to all resources more information can be found here: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
@@ -24,7 +24,7 @@ nginx-lab:
   # i.e. hostnames index 0 > externaldns.target
   # or in other words application01.aclab.uk will CNAME > app01-lab.avi.aclab.uk
   externaldns:
-    target: "app01-lab.gslb.avi.aclab.uk"
+    target: "application01.gslb.avi.aclab.uk"
     ttl: 30
 
   # hostnames for certificates, httprules and ingresses or httpRoutes depending on which is enabled
@@ -34,8 +34,8 @@ nginx-lab:
   # the first hostname is the primary production FQDN for the application and is the only one that will be attached to external-dns
   # for the CNAME target please change externaldns.target
   hostnames:
-    - app01-lab.gslb.avi.aclab.uk
-    - app01-lab.gslb.avi.aclab.uk
+    - application01.aclab.uk
+    - app01-lab.avir02.aclab.uk
 
   # cluster issuer reference for certificate manager
   certmanager:

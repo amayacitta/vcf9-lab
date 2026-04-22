@@ -1,0 +1,42 @@
+{{- if and .Values.argocd.enabled .Values.argocd.vksclusters.region02.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: vks-apps-region02
+  namespace: {{ .Values.argocd.applicationset.vksapps.namespace }}
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+  - matrix:
+      generators:
+        - git:
+            repoURL: {{ .Values.argocd.applicationset.vksapps.git.repoURL }}
+            revision: {{ .Values.argocd.applicationset.vksapps.git.targetRevision }}
+            directories:
+            - path: {{ .Values.argocd.applicationset.vksapps.git.path }}
+        - clusters:    
+{{- with .Values.argocd.vksclusters.region02.selector }} 
+            selector:
+{{ toYaml . | indent 14 -}}
+{{ end }}             
+  template:      
+    metadata:
+      name: {{ printf "{{ (split \":\" .name)._0 }}-{{index .path.segments 2}}" | quote }}
+    spec:
+      project: {{ .Values.argocd.applicationset.vksapps.project }}
+      source:
+        repoURL: {{ .Values.argocd.applicationset.vksapps.git.repoURL }}
+        targetRevision: {{ .Values.argocd.applicationset.vksapps.git.targetRevision }}
+        path: {{ printf "{{.path.path}}" | quote }}
+        helm:
+          valueFiles:
+            - {{ .Values.argocd.vksclusters.region02.helmValuesFile }}
+      destination:
+        server: {{ printf "{{.server}}" | quote }}
+        namespace: {{ printf "{{index .path.segments 2}}" | quote }}
+{{- with .Values.argocd.applicationset.vksapps.syncPolicy }}
+      syncPolicy:
+{{ toYaml . | indent 8 -}}
+{{ end }}
+{{ end }}
