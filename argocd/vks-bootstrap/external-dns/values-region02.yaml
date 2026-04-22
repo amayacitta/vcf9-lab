@@ -2,7 +2,7 @@ vksclusters:
   region01:
     enabled: false
   region02:
-    enabled: true
+    enabled: false
 
 external-dns:
   provider:
