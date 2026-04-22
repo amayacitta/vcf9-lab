@@ -13,7 +13,7 @@ external-dns:
     - aclab.uk
 
   # exclude domains which are delgated to the avi dns service
-  excludeDomains: ["avi.aclab.uk",gslb.aclab.uk]
+  excludeDomains: ["avi.aclab.uk","gslb.aclab.uk","test.com"]
 
   # assign text record which is has specific tagging for the region and cluster
   registry: txt
