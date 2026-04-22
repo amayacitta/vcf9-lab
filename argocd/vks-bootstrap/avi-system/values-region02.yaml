@@ -19,6 +19,7 @@ ako:
     layer7Only: false # If this flag is switched on, then AKO will only do layer 7 loadbalancing.
     enableEVH: true # This enables the Enhanced Virtual Hosting Model in Avi Controller for the Virtual Services
   NetworkSettings:
+    nsxtT1LR: "/infra/tier-1s/t1-avi"
     # nsxtT1LR: "/orgs/default/projects/default/vpcs/vks-clusters_17accbab-45cc-48ba-866f-1c2224679911" # Unique ID (note: not display name) of the T1 Logical Router for Service Engine connectivity. Only applies to NSX-T cloud.
     # Network information of the VIP network. Multiple networks allowed only for AWS Cloud.
     # Either networkName or networkUUID should be specified.
