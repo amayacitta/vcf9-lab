@@ -29,7 +29,7 @@ ako:
         cidr: 10.166.110.0/24
 
     # The defaultDomain should be configured as a sub-domain in Avi cloud.
-    defaultDomain: 'avi.aclab.uk'
+    defaultDomain: 'avir02.aclab.uk'
 
   ### This section outlines all the knobs  used to control Layer 7 loadbalancing settings in AKO.
   L7Settings:
