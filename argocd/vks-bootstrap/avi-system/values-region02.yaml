@@ -10,20 +10,22 @@ ako:
     GatewayAPI: true
     EnablePrometheus: true
   AKOSettings:
-    vpcMode: true
+    vpcMode: false
     logLevel: INFO   # enum: INFO|DEBUG|WARN|ERROR
     deleteConfig: 'false' # Has to be set to true in configmap if user wants to delete AKO created objects from AVI 
     disableStaticRouteSync: 'true' # If the POD networks are reachable from the Avi SE, set this knob to true.
-    clusterName: aclab-vks-01  # A unique identifier for the kubernetes cluster, that helps distinguish the objects for this cluster in the avi controller. // MUST-EDIT
+    clusterName: aclab-vks-02  # A unique identifier for the kubernetes cluster, that helps distinguish the objects for this cluster in the avi controller. // MUST-EDIT
     #cniPlugin: 'ncp'
     layer7Only: false # If this flag is switched on, then AKO will only do layer 7 loadbalancing.
     enableEVH: true # This enables the Enhanced Virtual Hosting Model in Avi Controller for the Virtual Services
   NetworkSettings:
-    nsxtT1LR: "/orgs/default/projects/default/vpcs/vks-clusters_17accbab-45cc-48ba-866f-1c2224679911" # Unique ID (note: not display name) of the T1 Logical Router for Service Engine connectivity. Only applies to NSX-T cloud.
+    # nsxtT1LR: "/orgs/default/projects/default/vpcs/vks-clusters_17accbab-45cc-48ba-866f-1c2224679911" # Unique ID (note: not display name) of the T1 Logical Router for Service Engine connectivity. Only applies to NSX-T cloud.
     # Network information of the VIP network. Multiple networks allowed only for AWS Cloud.
     # Either networkName or networkUUID should be specified.
     # If duplicate networks are present for the network name, networkUUID should be used for appropriate network.
-    vipNetworkList: []
+    vipNetworkList:
+      - networkName: "avi-vs"
+        cidr: 10.166.110.0/24
 
     # The defaultDomain should be configured as a sub-domain in Avi cloud.
     defaultDomain: 'avi.aclab.uk'
@@ -37,7 +39,7 @@ ako:
   ControllerSettings:
     serviceEngineGroupName: Default-Group # Name of the ServiceEngine Group.
     cloudName: home-m01-nsx # The configured cloud name on the Avi controller.
-    controllerHost: '10.166.101.27' # IP address or Hostname of Avi Controller
+    controllerHost: '10.166.101.31' # IP address or Hostname of Avi Controller
     tenantName: admin # Name of the tenant where all the AKO objects will be created in AVI. 
 
   # If username and either password or authtoken are not specified, avi-secret will not be created. AKO will assume that the avi-secret already exists and will reference it. The Avi Controller credentials, including certificateAuthorityData, will be read from the existing avi-secret.
@@ -129,7 +131,7 @@ amko:
     - avi-amko-sa@aclab-vks-02
 
   configs:
-    gslbLeaderController: "10.166.101.27"
+    gslbLeaderController: "10.166.101.31"
     controllerVersion: 31.1.1
     tenant: admin
     memberClusters:
