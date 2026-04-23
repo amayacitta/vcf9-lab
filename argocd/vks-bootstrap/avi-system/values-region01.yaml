@@ -26,7 +26,7 @@ ako:
     vipNetworkList: []
 
     # The defaultDomain should be configured as a sub-domain in Avi cloud.
-    defaultDomain: 'avi.aclab.uk'
+    defaultDomain: 'region01.aclab.uk'
 
   ### This section outlines all the knobs  used to control Layer 7 loadbalancing settings in AKO.
   L7Settings:

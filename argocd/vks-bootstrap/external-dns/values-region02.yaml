@@ -14,7 +14,7 @@ external-dns:
 
   # exclude domains which are delgated to the avi dns service
   excludeDomains: 
-    - avir02.aclab.uk
+    - region02.aclab.uk
     - gslb.aclab.uk
 
   # assign text record which is has specific tagging for the region and cluster
@@ -37,7 +37,7 @@ external-dns:
 
   extraArgs:
     ## insecure
-    - --rfc2136-insecure
+    # - --rfc2136-insecure
     ## common
     - --rfc2136-load-balancing-strategy=round-robin
     - --rfc2136-host=dc01.corp.aclab.uk
@@ -45,11 +45,11 @@ external-dns:
     - --rfc2136-zone=aclab.uk
     - --rfc2136-tsig-axfr
     # secure
-    # - --rfc2136-gss-tsig
-    # - --rfc2136-kerberos-username=svc_externaldns
-    # - --rfc2136-kerberos-password=$(KRB_PASSWORD)
-    # - --rfc2136-kerberos-realm=CORP.ACLAB.UK
-    # - --rfc2136-tsig-secret-alg=hmac-sha256
+    - --rfc2136-gss-tsig
+    - --rfc2136-kerberos-username=svc_externaldns
+    - --rfc2136-kerberos-password=$(KRB_PASSWORD)
+    - --rfc2136-kerberos-realm=CORP.ACLAB.UK
+    - --rfc2136-tsig-secret-alg=hmac-sha256
 
   sources:
     - ingress

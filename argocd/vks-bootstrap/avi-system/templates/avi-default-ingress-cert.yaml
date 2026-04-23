@@ -7,7 +7,8 @@ metadata:
 spec:
   commonName: "*.avi.aclab.uk"
   dnsNames:
-    - "*.avi.aclab.uk"
+    - "*.region01.aclab.uk"
+    - "*.region02.aclab.uk"
     - "*.aclab.uk"
   secretName: router-certs-default
   issuerRef:
