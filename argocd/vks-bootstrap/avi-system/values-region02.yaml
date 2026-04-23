@@ -160,15 +160,19 @@ amko:
 
     # list of all clusters and their traffic weights, if unspecified, default weights will be
     # given (optional). Uncomment below to add the required trafficSplit.
-    # trafficSplit:
-    #   - cluster: "cluster1-admin"
-    #     weight: 8
-    #   - cluster: "cluster2-admin"
-    #     weight: 2
+    # weights for these clusters range from 1 to 20
+    # the maximum value for priority is 100 and default is 10
+    trafficSplit:
+      - cluster: avi-amko-sa@aclab-vks-01
+        weight: 20
+        priority: 20
+      - cluster: avi-amko-sa@aclab-vks-02
+        weight: 20
+        priority: 10
 
     # Uncomment below to specify a ttl value in seconds. By default, the value is inherited from
     # Avi's DNS VS.
-    # ttl: 10
+    ttl: 10
 
     # Uncomment below to specify custom health monitor refs. By default, HTTP/HTTPS path based health
     # monitors are applied on the GSs.

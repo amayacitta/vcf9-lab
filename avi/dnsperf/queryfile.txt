@@ -1,0 +1,2 @@
+# dnsperf -d queryfile.txt -s 10.166.108.10 -n 9999
+application01.aclab.uk CNAME
