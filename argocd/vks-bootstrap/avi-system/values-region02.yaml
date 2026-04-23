@@ -124,7 +124,7 @@ amko:
     # cluster context where AMKO is going to be deployed
     currentCluster: avi-amko-sa@aclab-vks-01
     # Set to true if AMKO on this cluster is the leader
-    currentClusterIsLeader: false
+    currentClusterIsLeader: true
     # member clusters to federate the GSLBConfig and GDP objects on, if the
     # current cluster context is part of this list, the federator will ignore it
     memberClusters:
