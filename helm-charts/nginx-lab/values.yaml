@@ -14,9 +14,9 @@ global:
 # external dns control for the application which is hard set with annotations only, ignoring the usual spec
 # the primary .hostnames will be used as the CNAME DNS record creation
 # i.e. hostnames index 0 > externaldns.target
-# or in other words application01.aclab.uk will CNAME > app01-lab.avi.aclab.uk
+# or in other words application01.aclab.uk will CNAME > application01.region01.aclab.uk
 externaldns:
-  target: "app01-lab.avi.aclab.uk"
+  target: "application01.gslb.aclab.uk"
   ttl: 30
 
 # hostnames for certificates, httprules and ingresses or httpRoutes depending on which is enabled
@@ -27,7 +27,7 @@ externaldns:
 # for the CNAME target please change externaldns.target
 hostnames:
   - application01.aclab.uk
-  - app01-lab.avi.aclab.uk
+  - application01.region01.aclab.uk
 
 # cluster issuer reference for certificate manager
 certmanager:
