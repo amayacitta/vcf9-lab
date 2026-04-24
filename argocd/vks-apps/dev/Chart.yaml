@@ -25,5 +25,5 @@ appVersion: "alpine3.23-perl"
 # chart dependencies
 dependencies:
   - name: aclab-nginx
-    version: 0.1.5
+    version: 0.1.6
     repository: oci://registry-1.docker.io/amayacitta
