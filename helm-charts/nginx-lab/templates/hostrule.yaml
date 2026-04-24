@@ -21,7 +21,7 @@ spec:
     #   termination: edge
     gslb:
       fqdn: {{ .Values.externaldns.target | required "A valid gslb fqdn is required!" | }}
-      includeAliases: false
+      includeAliases: true
     # httpPolicy:
     #   policySets:
     #   - avi-secure-policy-ref
