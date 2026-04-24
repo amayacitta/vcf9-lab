@@ -35,7 +35,7 @@ aclab-nginx:
   # for the CNAME target please change externaldns.target
   hostnames:
     - application01.aclab.uk
-    - app01-lab.region01.aclab.uk
+    - application01.region01.aclab.uk
 
   # cluster issuer reference for certificate manager
   certmanager:
