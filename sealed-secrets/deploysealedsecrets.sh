@@ -13,6 +13,7 @@ create_sealed_secrets () {
     echo "creating manifest for ako and amko"
     echo "{{- if .Values.vksclusters.$region.enabled }}" > ../argocd/vks-bootstrap/avi-system/templates/sealedsecret-$region.yaml
     kubectl get secret -n avi-system avi-secret -o yaml | kubeseal -o yaml >> ../argocd/vks-bootstrap/avi-system/templates/sealedsecret-$region.yaml
+    echo "---" >> ../argocd/vks-bootstrap/avi-system/templates/sealedsecret-$region.yaml
     kubectl get secret -n avi-system gslb-avi-secret -o yaml | kubeseal -o yaml >> ../argocd/vks-bootstrap/avi-system/templates/sealedsecret-$region.yaml
     echo "{{ end -}}" >> ../argocd/vks-bootstrap/avi-system/templates/sealedsecret-$region.yaml
     echo "manifest created..."
