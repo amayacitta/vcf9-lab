@@ -41,7 +41,7 @@ spec:
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          image: {{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
+          image: {{ .Values.image.repository }}:{{ .Chart.AppVersion }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
@@ -144,7 +144,7 @@ spec:
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          image: {{ .Values.image.repository }}
+          image: {{ .Values.image.repository }}:{{ .Chart.AppVersion }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
@@ -247,7 +247,7 @@ spec:
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          image: {{ .Values.image.repository }}
+          image: {{ .Values.image.repository }}:{{ .Chart.AppVersion }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
@@ -350,7 +350,7 @@ spec:
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          image: {{ .Values.image.repository }}
+          image: {{ .Values.image.repository }}:{{ .Chart.AppVersion }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
