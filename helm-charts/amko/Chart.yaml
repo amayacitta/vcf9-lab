@@ -1,7 +1,0 @@
-## cutomised so we can deploy secrets without static values credentials
-apiVersion: v2
-appVersion: 2.1.1
-description: A helm chart for Avi Kubernetes Operator
-name: amko
-type: application
-version: 2.1.1
