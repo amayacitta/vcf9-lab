@@ -1,0 +1,261 @@
+{
+    "fipsEnabled": true,
+    "skipEsxThumbprintValidation": true,
+    "skipGatewayPingValidation": true,
+    "version": "9.1.0.0",
+    "vcfInstanceName": "home",
+    "sddcId": "home-m01",
+    "ceipEnabled": false,
+    "workflowType": "VCF",
+    "dnsSpec": {
+        "subdomain": "aclab.uk",
+        "nameservers": [
+            "10.166.101.254"
+        ]
+    },
+    "ntpServers": [
+        "10.166.101.254"
+    ],
+    "hostSpecs": [
+        {
+            "hostname": "esx01.aclab.uk",
+            "credentials": {
+                "username": "root",
+                "password": "changeme"
+            }
+        },
+        {
+            "hostname": "esx02.aclab.uk",
+            "credentials": {
+                "username": "root",
+                "password": "changeme"
+            }
+        }
+    ],
+    "networkSpecs": [
+        {
+            "networkType": "MANAGEMENT",
+            "ipAddressVersion": "IPv4",
+            "subnet": "10.166.100.0/24",
+            "gateway": "10.166.100.254",
+            "vlanId": "100",
+            "activeUplinks": ["uplink1", "uplink2"],
+            "standbyUplinks": [],
+            "portGroupKey": "dp-esx-mgmt-v100",
+            "teamingPolicy": "loadbalance_loadbased"
+        },
+        {
+            "networkType": "VM_MANAGEMENT",
+            "ipAddressVersion": "IPv4",
+            "subnet": "10.166.101.0/24",
+            "gateway": "10.166.101.254",
+            "vlanId": "101",
+            "mtu": "1500",
+            "portGroupKey": "dp-vm-mgmt-v101",
+            "activeUplinks": ["uplink1", "uplink2"],
+            "standbyUplinks": [],
+            "teamingPolicy": "loadbalance_loadbased"
+        },
+        {
+            "networkType": "VMOTION",
+            "ipAddressVersion": "IPv4",
+            "subnet": "10.166.102.0/24",
+            "gateway": "10.166.102.254",
+            "vlanId": "102",
+            "mtu": 9000,
+            "includeIpAddressRanges": [
+                {
+                    "startIpAddress": "10.166.102.10",
+                    "endIpAddress": "10.166.102.100"
+                }
+            ],
+            "activeUplinks": ["uplink1", "uplink2"],
+            "standbyUplinks": [],
+            "portGroupKey": "dp-vmotion-v102",
+            "teamingPolicy": "loadbalance_loadbased"
+        },
+        {
+            "networkType": "VSAN",
+            "ipAddressVersion": "IPv4",
+            "subnet": "10.166.103.0/24",
+            "gateway": "10.166.103.254",
+            "vlanId": "103",
+            "mtu": 9000,
+            "includeIpAddressRanges": [
+                {
+                    "startIpAddress": "10.166.103.10",
+                    "endIpAddress": "10.166.103.100"
+                }
+            ],
+            "activeUplinks": ["uplink1", "uplink2"],
+            "standbyUplinks": [],
+            "portGroupKey": "dp-vsan-v103",
+            "teamingPolicy": "loadbalance_loadbased"
+        }
+    ],
+    "vspClusterSpec": {
+        "ipv4Pool": {
+            "ipRange": {
+                "startIpAddress": "10.166.101.100",
+                "endIpAddress": "10.166.101.130"
+            }
+        },
+        "platformFqdn": "vsp01.aclab.uk",
+        "instanceFqdn": "shared01.aclab.uk",
+        "fleetFqdn": "fleetlcm.aclab.uk",
+        "size": "small",
+        "name": "home-m01-vmsp-01",
+        "internalClusterCidrIpv4": "198.18.0.0/15"
+    },
+    "vcfAutomationSpec": {
+        "ipPool": [
+            "10.166.101.131",
+            "10.166.101.132",
+            "10.166.101.133",
+            "10.166.101.134",
+            "10.166.101.135",
+            "10.166.101.136"
+        ],
+        "hostname": "auto01.aclab.uk",
+        "platformFqdn": "auto-platform.aclab.uk",
+        "nodePrefix": "home-m01-node-01",
+        "internalClusterCidr": "198.18.0.0/15",
+        "useExistingDeployment": false,
+        "size": "small"
+    },
+    "nsxtSpec": {
+        "vipFqdn": "nsx01.aclab.uk",
+        "transportVlanId": "104",
+        "nsxtAdminPassword": "changeme",
+        "nsxtAuditPassword": "changeme",
+        "rootNsxtManagerPassword": "changeme",
+        "ipAddressPoolSpec": {
+            "name": "home-m01-cl01-tep01",
+            "description": "ESX Host VTEP Pool",
+            "subnets": [
+                {
+                    "cidr": "10.166.104.0/24",
+                    "gateway": "10.166.104.254",
+                    "ipAddressPoolRanges": [
+                        {
+                            "start": "10.166.104.10",
+                            "end": "10.166.104.100"
+                        }
+                    ]
+                }
+            ]
+        },
+        "nsxtManagerSize": "medium",
+        "useExistingDeployment": false,
+        "nsxtManagers": [
+            {
+                "hostname": "nsxm01.aclab.uk"
+            }
+        ]
+    },
+    "vcfOperationsSpec": {
+        "applianceSize": "small",
+        "adminUserPassword": "changeme",
+        "useExistingDeployment": false,
+        "nodes": [
+            {
+                "hostname": "ops01a.aclab.uk",
+                "type": "master",
+                "rootUserPassword": "changeme"
+            }
+        ]
+    },
+    "vcfOperationsCollectorSpec": {
+        "applianceSize": "small",
+        "hostname": "opsc01.aclab.uk",
+        "rootUserPassword": "changeme",
+        "useExistingDeployment": false
+    },
+    "licenseServerSpec": {
+        "hostname": "license.aclab.uk"
+    },
+    "vidbSpec": {
+        "hostname": "vidb.aclab.uk"
+    },
+    "saltSpec": {},
+    "saltRaasSpec": {},
+    "telemetryAcceptorSpec": {},
+    "fleetLcmSpec": {
+        "hostname": "fleetlcm.aclab.uk"
+    },
+    "sddcLcmSpec": {
+        "hostname": "shared01.aclab.uk"
+    },
+    "fleetDepotSpec": {},
+    "vcenterSpec": {
+        "vcenterHostname": "vc01.aclab.uk",
+        "vmSize": "small",
+        "storageSize": "lstorage",
+        "ssoDomain": "vsphere.local",
+        "useExistingDeployment": false
+    },
+    "clusterSpec": {
+        "clusterEvcMode": "",
+        "datacenterName": "home-m01-dc01",
+        "clusterName": "home-m01-cl01"
+    },
+    "datastoreSpec": {
+        "vsanSpec": {
+            "failuresToTolerate": 0,
+            "vsanDedup": false,
+            "esaConfig": {
+                "enabled": true
+            },
+            "datastoreName": "home-m01-cl01-ds-vsan01",
+            "encryptionConfig": {
+                "dataInTransitConfig": {
+                    "enable": true,
+                    "rekeyInterval": 1440
+                }
+            }
+        }
+    },
+    "dvsSpecs": [
+        {
+            "dvsName": "home-m01-cl01-vds01",
+            "networks": ["MANAGEMENT", "VM_MANAGEMENT", "VMOTION", "VSAN"],
+            "mtu": 9000,
+            "nsxtSwitchConfig": {
+                "transportZones": [
+                    {
+                        "name": "vcf-overlay-tz",
+                        "transportType": "OVERLAY"
+                    }
+                ]
+            },
+            "vmnicsToUplinks": [
+                {
+                    "id": "vmnic1",
+                    "uplink": "uplink1"
+                },
+                {
+                    "id": "vmnic2",
+                    "uplink": "uplink2"
+                }
+            ],
+            "nsxTeamings": [
+                {
+                    "policy": "LOADBALANCE_SRCID",
+                    "activeUplinks": ["uplink1", "uplink2"],
+                    "standByUplinks": null
+                }
+            ],
+            "lagSpecs": null
+        }
+    ],
+    "sddcManagerSpec": {
+        "hostname": "sddcm01.aclab.uk",
+        "localUserPassword": "changeme",
+        "rootPassword": "changeme",
+        "useExistingDeployment": true,
+        "secondUserCredentials": {
+            "password": "changeme",
+            "username": "vcf"
+        }
+    }
+}
