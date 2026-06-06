@@ -2,16 +2,24 @@
 .DESCRIPTION
     This script deploys a single node AVI control plane cluster via SDDC manager for VMware Cloud Foundation.
 
-    To find the AVI version reference the following table. Please refer to the JSON file in the avi GitHub repository for the latest versions and build numbers:
+    For < 9.1 to find the AVI version reference the following table. Please refer to the JSON file in the avi GitHub repository for the latest versions and build numbers:
     https://github.com/avinetworks/devops/blob/master/tools/vcf/pvc.json 
     
     +---------+-------+-----------------------------+------------------+
-    | Version | Build | OVA File                    | Patch ID         |
+    | Version | Build | OVA File                    | Product Version  |
     +---------+-------+-----------------------------+------------------+
-    | 31.1.1  | 9.0.0 | controller-31.1.1-9122.ova | 31.1.1-24544104   |
-    | 31.1.2  | 9.0.1 | controller-31.1.2-9193.ova | 31.1.2-24923866   |
-    | 31.2.1  | 9.0.2 | controller-31.2.1-9148.ova | 31.2.1-25015167   |
+    | 31.1.1  | 9.0.0 | controller-31.1.1-9122.ova  | 31.1.1-24544104  |
+    | 31.1.2  | 9.0.1 | controller-31.1.2-9193.ova  | 31.1.2-24923866  |
+    | 31.2.1  | 9.0.2 | controller-31.2.1-9148.ova  | 31.2.1-25015167  |
     +---------+-------+-----------------------------+------------------+
+
+    For 9.1 and above you the pvc.json file on git is no longer updated, instead the OVA is pushed via VCF Operations. Below are the versions.
+
+    +----------+----------+-----------------------------+------------------+
+    | Version  | Build    | OVA File                    | Product Version  |
+    +----------+----------+-----------------------------+------------------+
+    | 32.1.1   | 9.1.0    | controller-32.1.1-9129.ova  | 32.1.1.25377988  |
+    +----------+----------+-----------------------------+------------------+
 
 .NOTES
     File Name      : deploy-single-node-avi.ps1
@@ -21,9 +29,13 @@
 .LINK
     https://www.amayacitta.co.uk
 .EXAMPLE
-    .\deploy-single-node-avi.ps1
+    Run the below for VCF 9.1 or above
+    .\deploy-single-node-avi.ps1 -vcf91
 	Follow the on screen prompts, type !? against each prompt for further information
 
+    Run the below for VCF 9.0.2 or below
+    .\deploy-single-node-avi.ps1
+	Follow the on screen prompts, type !? against each prompt for further information
 #>
 param 	(
 		# Mandatory Parameters
@@ -47,7 +59,7 @@ param 	(
 		
 		[parameter(
             Mandatory=$true,
-            HelpMessage="Enter the product version of NSX-ALB to deploy in the format of <version>-<build>. Refer to productVersion within https://github.com/avinetworks/devops/blob/master/tools/vcf/pvc.json"
+            HelpMessage="Enter the product version of NSX-ALB to deploy in the format of <version>-<build>. Refer to the table in the description"
             )]
             [string]$aviProductVersion,  
 
@@ -80,17 +92,27 @@ param 	(
             Mandatory=$true,
             HelpMessage="Enter the AVI cluster name to be deployed"
             )]
-            [string]$aviNodeIP
+            [string]$aviNodeIP,
+        
+		[parameter(
+            HelpMessage="Set if deploying VC 9.1 or above, ignore if deploying something earlier"
+            )]
+            [switch]$vcf91
         )
 
-# Convert SecureStrings to plain text temporarily
-$plainsddcmPassword = [Runtime.InteropServices.Marshal]::PtrToStringAuto(
-    [Runtime.InteropServices.Marshal]::SecureStringToBSTR($sddcmPassword)
-)
+# cross platform securestring to plain text function
+function Convert-SecureStringToPlainText {
+    param (
+        [Parameter(Mandatory)]
+        [System.Security.SecureString]$SecureString
+    )
 
-$plainaviAdminPassword = [Runtime.InteropServices.Marshal]::PtrToStringAuto(
-    [Runtime.InteropServices.Marshal]::SecureStringToBSTR($aviAdminPassword)
-)
+    return (New-Object PSCredential "user", $SecureString).GetNetworkCredential().Password
+}
+
+# Convert the secure strings to plain text for use in API calls, these will be removed from memory immediately after use
+$plainsddcmPassword    = Convert-SecureStringToPlainText $sddcmPassword
+$plainaviAdminPassword = Convert-SecureStringToPlainText $aviAdminPassword
 
 # Create the json payload
 $payload = @{
@@ -145,6 +167,10 @@ $payload = [ordered]@{
     "nodes" = @(@{"ipAddress" = $aviNodeIP})
     "nsxIds" = @($nsxClusterId)
     "bundleId" = $aviBundleId
+}
+
+if($vcf91 -eq $true) {
+    $payload["vcfopsAdminPassword"] = $aviAdminPassword
 }
 
 $body = $payload | ConvertTo-Json
