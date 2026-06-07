@@ -1,48 +1,104 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -Eeuo pipefail
 
 BASE="https://wp-content.vmware.com/v2/latest"
-LIB_JSON="$BASE/lib.json"
-ITEMS_JSON="$BASE/items.json"
 
-echo "Downloading lib.json"
-curl -fL --retry 3 --retry-delay 5 "$LIB_JSON" -o lib.json
+need_cmd() {
+    command -v "$1" >/dev/null 2>&1 || {
+        echo "Missing required command: $1"
+        exit 1
+    }
+}
 
-echo "Downloading items.json"
-curl -fL --retry 3 --retry-delay 5 "$ITEMS_JSON" -o items.json
+download() {
+    local url="$1"
+    local out="$2"
 
-if ! command -v jq >/dev/null 2>&1; then
-    echo "jq is required. Install it with:"
-    echo "  tdnf install -y jq"
-    exit 1
-fi
+    mkdir -p "$(dirname "$out")"
 
-jq -c '.items[]' items.json | while IFS= read -r item; do
-    item_name=$(echo "$item" | jq -r '.name // empty')
+    echo "Downloading $url -> $out"
+    curl -fL --retry 3 --retry-delay 5 --continue-at - "$url" -o "$out"
+}
 
-    if [[ -z "$item_name" || "$item_name" == "null" ]]; then
-        continue
-    fi
+# Extract file paths from whatever schema this item uses
+extract_paths() {
+    local item_json="$1"
 
-    echo "Processing $item_name"
-    mkdir -p "$item_name"
+    jq -r '
+      def emit_entry:
+        if . == null then empty
+        elif type == "string" then .
+        elif type == "object" then
+          (.href? // empty),
+          (.hrefs[]? // empty)
+        else empty
+        end;
 
-    echo "$item" | jq -r '.files.hrefs[]? // empty' | while IFS= read -r relpath; do
-        if [[ -z "$relpath" || "$relpath" == "null" ]]; then
+      .files as $f
+      | if $f == null then
+          empty
+        elif ($f | type) == "array" then
+          $f[] | emit_entry
+        elif ($f | type) == "object" then
+          $f | emit_entry
+        else
+          empty
+        end
+    ' <<<"$item_json" | sed '/^null$/d;/^$/d' | sort -u
+}
+
+main() {
+    need_cmd curl
+    need_cmd jq
+
+    echo "Downloading lib.json"
+    download "$BASE/lib.json" "lib.json"
+
+    echo "Downloading items.json"
+    download "$BASE/items.json" "items.json"
+
+    jq -c '.items[]' items.json | while IFS= read -r item; do
+        item_name="$(jq -r '.name // empty' <<<"$item")"
+
+        if [[ -z "$item_name" || "$item_name" == "null" ]]; then
+            echo "Skipping item with no valid name"
             continue
         fi
 
-        filename="$(basename "$relpath")"
-        url="$BASE/$relpath"
-        out="$item_name/$filename"
+        echo "Processing $item_name"
 
-        if [[ -f "$out" ]]; then
-            echo "Skipping existing $out"
-            continue
+        # Download item.json in each folder
+        item_json_url="$BASE/$item_name/item.json"
+        item_json_out="$item_name/item.json"
+
+        if [[ ! -f "$item_json_out" ]]; then
+            echo "Downloading $item_json_url -> $item_json_out"
+            curl -fL --retry 3 --retry-delay 5 "$item_json_url" -o "$item_json_out"
         fi
 
-        echo "Downloading $url -> $out"
-        curl -fL --retry 3 --retry-delay 5 --continue-at - "$url" -o "$out"
+        found_any=0
+
+        while IFS= read -r relpath; do
+            [[ -n "$relpath" ]] || continue
+            found_any=1
+
+            # If relpath already includes directories, mirror it exactly.
+            # If it is just a filename, place it under the item folder.
+            if [[ "$relpath" == */* ]]; then
+                out="$relpath"
+            else
+                out="$item_name/$relpath"
+            fi
+
+            url="$BASE/${relpath#/}"
+            download "$url" "$out"
+        done < <(extract_paths "$item")
+
+        if [[ "$found_any" -eq 0 ]]; then
+            echo "No downloadable paths found for $item_name"
+        fi
     done
-done
+}
+
+main "$@"
