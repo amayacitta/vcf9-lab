@@ -2,40 +2,49 @@
 
 set -euo pipefail
 
-base_tkg_content_library_uri="https://wp-content.vmware.com/v2/latest"
-tkg_content_library_lib_url="${base_tkg_content_library_uri}/lib.json"
-tkg_content_library_items_url="${base_tkg_content_library_uri}/items.json"
+base="https://wp-content.vmware.com/v2/latest"
 
 echo "Downloading lib.json"
-curl -sSfL "$tkg_content_library_lib_url" -o lib.json
+curl -sSfL "$base/lib.json" -o lib.json
 
 echo "Downloading items.json"
-curl -sSfL "$tkg_content_library_items_url" -o items.json
+curl -sSfL "$base/items.json" -o items.json
 
-# Ensure jq is installed
 if ! command -v jq >/dev/null 2>&1; then
-    echo "jq is required but not installed. Install it first."
-    echo "please run: tdnf install jq -y"
+    echo "Install jq first: tdnf install jq -y"
     exit 1
 fi
 
-# Iterate over ALL items
-jq -c '.items[]' items.json | while read -r item; do
-    itemFolderName=$(echo "$item" | jq -r '.name')
+download_file() {
+    local url="$1"
+    local file
+    file=$(basename "$url")
 
-    if [ ! -d "$itemFolderName" ]; then
-        echo "Downloading ${itemFolderName} ..."
-        mkdir -p "$itemFolderName"
-        pushd "$itemFolderName" >/dev/null
-
-        # Correct extraction of file URLs
-        echo "$item" | jq -r '.files[]?.href // empty' | while read -r file; do
-            itemDownloadUrl="${base_tkg_content_library_uri}/${file}"
-
-            echo "Downloading ${file} ..."
-            curl -sSfL --retry 3 --retry-delay 5 "$itemDownloadUrl" -o "$(basename "$file")"
-        done
-
-        popd >/dev/null
+    if [ -f "$file" ]; then
+        return
     fi
+
+    echo "Downloading $file"
+    curl -sSfL --retry 3 --retry-delay 5 "$url" -o "$file"
+
+    # If it's JSON, inspect it for more hrefs
+    if [[ "$file" == *.json ]]; then
+        jq -r '.. | .href? // empty' "$file" | while read -r nested; do
+            download_file "$base/$nested"
+        done
+    fi
+}
+
+jq -c '.items[]' items.json | while read -r item; do
+    name=$(echo "$item" | jq -r '.name')
+    echo "Processing $name"
+
+    mkdir -p "$name"
+    pushd "$name" >/dev/null
+
+    echo "$item" | jq -r '.files[]?.href // empty' | while read -r href; do
+        download_file "$base/$href"
+    done
+
+    popd >/dev/null
 done
