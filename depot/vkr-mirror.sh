@@ -20,21 +20,16 @@ if ! command -v jq >/dev/null 2>&1; then
 fi
 
 # Iterate over items
-jq -c '.items[]' items.json | while read -r item; do
-    itemFolderName=$(echo "$item" | jq -r '.name')
+echo "$item" | jq -r '
+  .files[]? |
+  if type == "object" then
+    (.hrefs[]? // .href)
+  else
+    empty
+  end
+' | while read -r file; do
+    itemDownloadUrl="${base_tkg_content_library_uri}/${file}"
 
-    if [ ! -d "$itemFolderName" ]; then
-        echo "Downloading ${itemFolderName} ..."
-        mkdir -p "$itemFolderName"
-        pushd "$itemFolderName" >/dev/null
-
-        echo "$item" | jq -r '.files[]?.hrefs[]?' | while read -r file; do
-            itemDownloadUrl="${base_tkg_content_library_uri}/${file}"
-
-            echo "Downloading ${file} ..."
-            curl -sSfL "$itemDownloadUrl" -o "$(basename "$file")"
-        done
-
-        popd >/dev/null
-    fi
+    echo "Downloading ${file} ..."
+    curl -sSfL "$itemDownloadUrl" -o "$(basename "$file")"
 done
