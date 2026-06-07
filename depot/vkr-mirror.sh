@@ -1,50 +1,29 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
-
-base="https://wp-content.vmware.com/v2/latest"
+base_depot_location="/var/www/html/VKR"
+base_tkg_content_library_uri="https://wp-content.vmware.com/v2/latest"
+tkg_content_library_lib_url="$base_tkg_content_library_uri/lib.json"
+tkg_content_library_items_url="$base_tkg_content_library_uri/items.json"
 
 echo "Downloading lib.json"
-curl -sSfL "$base/lib.json" -o lib.json
+curl -L -o $base_depot_location/lib.json $tkg_content_library_lib_url
 
 echo "Downloading items.json"
-curl -sSfL "$base/items.json" -o items.json
+curl -L -o $base_depot_location/items.json $tkg_content_library_items_url
 
-if ! command -v jq >/dev/null 2>&1; then
-    echo "Install jq first: tdnf install jq -y"
-    exit 1
-fi
+items=$(cat $base_depot_location/items.json)
 
-download_file() {
-    local url="$1"
-    local file
-    file=$(basename "$url")
+while read allitems
+do
+dirname=$(echo $allitems | jq -r '.name')
+downloadurls=$(echo $allitems | jq -r '.files[].hrefs')
 
-    if [ -f "$file" ]; then
-        return
-    fi
+newdir=$base_depot_location/$dirname
+mkdir $newdir
 
-    echo "Downloading $file"
-    curl -sSfL --retry 3 --retry-delay 5 "$url" -o "$file"
+###The --output-dir option is available since curl 7.73.0: So we are using wget who can compare incompletes and specify a directory.
+echo $downloadurls | jq -c '.[]' | xargs -I % wget --no-if-modified-sinc -N -P "$newdir/" "$base_tkg_content_library_uri/%"
 
-    # If it's JSON, inspect it for more hrefs
-    if [[ "$file" == *.json ]]; then
-        jq -r '.. | .href? // empty' "$file" | while read -r nested; do
-            download_file "$base/$nested"
-        done
-    fi
-}
+wget --no-if-modified-sinc -N -P "$newdir/" "$base_tkg_content_library_uri/$dirname/item.json"
 
-jq -c '.items[]' items.json | while read -r item; do
-    name=$(echo "$item" | jq -r '.name')
-    echo "Processing $name"
-
-    mkdir -p "$name"
-    pushd "$name" >/dev/null
-
-    echo "$item" | jq -r '.files[]?.href // empty' | while read -r href; do
-        download_file "$base/$href"
-    done
-
-    popd >/dev/null
-done
+done < <(echo $items | jq -c '.items[]')
