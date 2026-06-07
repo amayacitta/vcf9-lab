@@ -9,32 +9,32 @@
       "vcenterCluster": "home-m01-cl01"
     }
   },
-  "tkgsComponentSpec": {
-    "tkgsMgmtNetworkSpec": {
-      "tkgsMgmtIpAssignmentMode": "DHCP",
-      "tkgsMgmtFloatingIp": "10.166.108.131",
-      "tkgsMgmtNetworkName": "tanzu-mgmt",
-      "tkgsMgmtNetworkDnsServers": [
+  "componentSpec": {
+    "mgmtNetworkSpec": {
+      "mgmtIpAssignmentMode": "DHCP",
+      "mgmtFloatingIp": "10.166.108.131",
+      "mgmtNetworkName": "tanzu-mgmt",
+      "mgmtNetworkDnsServers": [
         "10.166.101.254"
       ],
-      "tkgsMgmtNetworkSearchDomains": [
+      "mgmtNetworkSearchDomains": [
         "aclab.uk"
       ],
-      "tkgsMgmtNetworkNtpServers": [
+      "mgmtNetworkNtpServers": [
         "10.166.101.254"
       ]
     },
-    "tkgsStoragePolicySpec": {
-      "masterStoragePolicy": "home-m01-cl01 - Optimal Datastore Default Policy - RAID1",
-      "ephemeralStoragePolicy": "home-m01-cl01 - Optimal Datastore Default Policy - RAID1",
-      "imageStoragePolicy": "home-m01-cl01 - Optimal Datastore Default Policy - RAID1"
+    "storagePolicySpec": {
+      "masterStoragePolicy": "home-m01-cl01 - Optimal Datastore Default Policy - AutoRAID",
+      "ephemeralStoragePolicy": "home-m01-cl01 - Optimal Datastore Default Policy - AutoRAID",
+      "imageStoragePolicy": "home-m01-cl01 - Optimal Datastore Default Policy - AutoRAID"
     },
     "nsxVpcNetworkInfo": {
       "nsxVpcProject": "Default",
       "nsxVpcConnectivityProfile": "Default VPC Connectivity Profile",
-      "tkgsWorkloadServiceCidr": "10.96.0.0/23",
+      "workloadServiceCidr": "10.96.0.0/23",
       "nsxVpcPrivateCidrs": [
-        "10.168.0.0/16"
+        "172.30.0.0/16"
       ],
       "nsxVpcDnsServers": [
         "10.166.101.254"
