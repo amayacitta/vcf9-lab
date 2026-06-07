@@ -3,33 +3,46 @@
 set -euo pipefail
 
 BASE="https://wp-content.vmware.com/v2/latest"
+LIB_JSON="$BASE/lib.json"
+ITEMS_JSON="$BASE/items.json"
 
-echo "Downloading metadata..."
-curl -sSfL "$BASE/lib.json" -o lib.json
-curl -sSfL "$BASE/items.json" -o items.json
+echo "Downloading lib.json"
+curl -fL --retry 3 --retry-delay 5 "$LIB_JSON" -o lib.json
 
-# check jq
-command -v jq >/dev/null || { echo "Install jq: tdnf install jq -y"; exit 1; }
+echo "Downloading items.json"
+curl -fL --retry 3 --retry-delay 5 "$ITEMS_JSON" -o items.json
 
-# loop items
-jq -c '.items[]' items.json | while read -r item; do
-    name=$(echo "$item" | jq -r '.name')
-    echo "Processing $name"
+if ! command -v jq >/dev/null 2>&1; then
+    echo "jq is required. Install it with:"
+    echo "  tdnf install -y jq"
+    exit 1
+fi
 
-    mkdir -p "$name"
+jq -c '.items[]' items.json | while IFS= read -r item; do
+    item_name=$(echo "$item" | jq -r '.name // empty')
 
-    # for each file reference
-    echo "$item" | jq -r '.files[].href' | while read -r href; do
-        url="$BASE/$href"
+    if [[ -z "$item_name" || "$item_name" == "null" ]]; then
+        continue
+    fi
 
-        echo "Downloading path: $href"
+    echo "Processing $item_name"
+    mkdir -p "$item_name"
 
-        # pull entire directory contents
-        curl -s "$url" | grep -Eo 'href="[^"]+"' | cut -d'"' -f2 | while read -r file; do
-            full_url="$url/$file"
+    echo "$item" | jq -r '.files.hrefs[]? // empty' | while IFS= read -r relpath; do
+        if [[ -z "$relpath" || "$relpath" == "null" ]]; then
+            continue
+        fi
 
-            echo " -> $file"
-            curl -sSfL --retry 3 "$full_url" -o "$name/$file"
-        done
+        filename="$(basename "$relpath")"
+        url="$BASE/$relpath"
+        out="$item_name/$filename"
+
+        if [[ -f "$out" ]]; then
+            echo "Skipping existing $out"
+            continue
+        fi
+
+        echo "Downloading $url -> $out"
+        curl -fL --retry 3 --retry-delay 5 --continue-at - "$url" -o "$out"
     done
 done
