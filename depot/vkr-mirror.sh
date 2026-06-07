@@ -28,7 +28,7 @@ jq -c '.items[]' items.json | while read -r item; do
         mkdir -p "$itemFolderName"
         pushd "$itemFolderName" >/dev/null
 
-        echo "$item" | jq -r '.files.hrefs[]' | while read -r file; do
+        echo "$item" | jq -r '.files[]?.hrefs[]?' | while read -r file; do
             itemDownloadUrl="${base_tkg_content_library_uri}/${file}"
 
             echo "Downloading ${file} ..."
