@@ -15,14 +15,27 @@ curl -sSfL "$tkg_content_library_items_url" -o items.json
 # Ensure jq is installed
 if ! command -v jq >/dev/null 2>&1; then
     echo "jq is required but not installed. Install it first."
-    echo "please run tdnf install jq -y then try again"
+    echo "please run: tdnf install jq -y"
     exit 1
 fi
 
-# Iterate over items
-echo "$item" | jq -r '.files[]?.href // empty' | while read -r file; do
-    itemDownloadUrl="${base_tkg_content_library_uri}/${file}"
+# Iterate over ALL items
+jq -c '.items[]' items.json | while read -r item; do
+    itemFolderName=$(echo "$item" | jq -r '.name')
 
-    echo "Downloading ${file} ..."
-    curl -sSfL "$itemDownloadUrl" -o "$(basename "$file")"
+    if [ ! -d "$itemFolderName" ]; then
+        echo "Downloading ${itemFolderName} ..."
+        mkdir -p "$itemFolderName"
+        pushd "$itemFolderName" >/dev/null
+
+        # Correct extraction of file URLs
+        echo "$item" | jq -r '.files[]?.href // empty' | while read -r file; do
+            itemDownloadUrl="${base_tkg_content_library_uri}/${file}"
+
+            echo "Downloading ${file} ..."
+            curl -sSfL --retry 3 --retry-delay 5 "$itemDownloadUrl" -o "$(basename "$file")"
+        done
+
+        popd >/dev/null
+    fi
 done
