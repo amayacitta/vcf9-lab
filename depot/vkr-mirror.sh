@@ -4,52 +4,32 @@ set -euo pipefail
 
 BASE="https://wp-content.vmware.com/v2/latest"
 
-echo "Downloading lib.json"
+echo "Downloading metadata..."
 curl -sSfL "$BASE/lib.json" -o lib.json
-
-echo "Downloading items.json"
 curl -sSfL "$BASE/items.json" -o items.json
 
-# Ensure jq is installed
-if ! command -v jq >/dev/null 2>&1; then
-    echo "jq is required. Run: tdnf install jq -y"
-    exit 1
-fi
+# check jq
+command -v jq >/dev/null || { echo "Install jq: tdnf install jq -y"; exit 1; }
 
-download_file() {
-    local url="$1"
-    local file
-    file=$(basename "$url")
-
-    # Skip if already exists
-    if [[ -f "$file" ]]; then
-        return
-    fi
-
-    echo "Downloading $file"
-    curl -sSfL --retry 3 --retry-delay 5 "$url" -o "$file"
-
-    # If it's JSON, follow nested refs (this is the missing piece)
-    if [[ "$file" == *.json ]]; then
-        while read -r nested; do
-            [[ -n "$nested" ]] || continue
-            download_file "$BASE/$nested"
-        done < <(jq -r '.. | objects | .href? // empty' "$file")
-    fi
-}
-
-# Main loop (no subshell issues)
-while IFS= read -r item; do
+# loop items
+jq -c '.items[]' items.json | while read -r item; do
     name=$(echo "$item" | jq -r '.name')
-
     echo "Processing $name"
+
     mkdir -p "$name"
-    cd "$name"
 
-    while read -r href; do
-        [[ -n "$href" ]] || continue
-        download_file "$BASE/$href"
-    done < <(echo "$item" | jq -r '.files[]?.href // empty')
+    # for each file reference
+    echo "$item" | jq -r '.files[].href' | while read -r href; do
+        url="$BASE/$href"
 
-    cd ..
-done < <(jq -c '.items[]' items.json)
+        echo "Downloading path: $href"
+
+        # pull entire directory contents
+        curl -s "$url" | grep -Eo 'href="[^"]+"' | cut -d'"' -f2 | while read -r file; do
+            full_url="$url/$file"
+
+            echo " -> $file"
+            curl -sSfL --retry 3 "$full_url" -o "$name/$file"
+        done
+    done
+done
