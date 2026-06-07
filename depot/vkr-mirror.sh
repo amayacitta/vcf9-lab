@@ -17,6 +17,12 @@ download() {
 
     mkdir -p "$(dirname "$out")"
 
+    # skip existing files
+    if [[ -f "$out" && -s "$out" ]]; then
+        echo "Skipping existing $out"
+        return 0
+    fi
+
     echo "Downloading $url -> $out"
     curl -fL --retry 3 --retry-delay 5 --continue-at - "$url" -o "$out"
 }
@@ -68,14 +74,13 @@ main() {
 
         echo "Processing $item_name"
 
-        # Download item.json in each folder
+        mkdir -p "$item_name"
+
         item_json_url="$BASE/$item_name/item.json"
         item_json_out="$item_name/item.json"
 
-        if [[ ! -f "$item_json_out" ]]; then
-            echo "Downloading $item_json_url -> $item_json_out"
-            curl -fL --retry 3 --retry-delay 5 "$item_json_url" -o "$item_json_out"
-        fi
+        download "$item_json_url" "$item_json_out" || \
+        echo "Warning: missing item.json for $item_name"
 
         found_any=0
 
