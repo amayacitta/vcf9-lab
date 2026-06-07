@@ -20,14 +20,7 @@ if ! command -v jq >/dev/null 2>&1; then
 fi
 
 # Iterate over items
-echo "$item" | jq -r '
-  .files[]? |
-  if type == "object" then
-    (.hrefs[]? // .href)
-  else
-    empty
-  end
-' | while read -r file; do
+echo "$item" | jq -r '.files[]?.href // empty' | while read -r file; do
     itemDownloadUrl="${base_tkg_content_library_uri}/${file}"
 
     echo "Downloading ${file} ..."
