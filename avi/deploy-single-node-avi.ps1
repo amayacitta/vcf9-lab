@@ -78,19 +78,19 @@ param 	(
  
 		[parameter(
             Mandatory=$true,
-            HelpMessage="Enter the AVI cluster name to be deployed"
+            HelpMessage="Enter the AVI control plane password"
             )]
             [securestring]$aviAdminPassword,  
 
 		[parameter(
             Mandatory=$true,
-            HelpMessage="Enter the AVI cluster name to be deployed"
+            HelpMessage="Enter the AVI control plane fqdn"
             )]
             [string]$aviFQDN,  
 
 		[parameter(
             Mandatory=$true,
-            HelpMessage="Enter the AVI cluster name to be deployed"
+            HelpMessage="Enter the AVI node address"
             )]
             [string]$aviNodeIP,
         
