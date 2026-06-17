@@ -17,7 +17,7 @@ spec:
     classRef:
       name: builtin-generic-v3.6.0
       namespace: vmware-system-vks-public 
-    version: v1.35.2+vmware.1-vkr.3
+    version: v1.35.5+vmware.1-vkr.1
     controlPlane:
       replicas: 1
       variables:
