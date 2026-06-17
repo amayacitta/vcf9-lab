@@ -76,7 +76,7 @@ spec:
       - name: vmClass
         value: best-effort-small
       - name: storageClass
-        value: home-m01-cl01-optimal-datastore-default-policy-raid1
+        value: home-m01-cl01-optimal-datastore-default-policy-autoraid
       - name: node
         value:
           firewall:
@@ -96,11 +96,11 @@ spec:
           ## add more space for kubelet, etcd, containerd etc.
         - name: containerd-override
           mountPath: /var/lib/containerd
-          storageClass: home-m01-cl01-optimal-datastore-default-policy-raid1
+          storageClass: home-m01-cl01-optimal-datastore-default-policy-autoraid
           capacity: 50Gi
         - name: kubelet-override
           mountPath: /var/lib/kubelet
-          storageClass: home-m01-cl01-optimal-datastore-default-policy-raid1
+          storageClass: home-m01-cl01-optimal-datastore-default-policy-autoraid
           capacity: 50Gi
       - name: osConfiguration
         value:
