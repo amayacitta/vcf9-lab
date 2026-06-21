@@ -1,0 +1,12 @@
+./oci_image_depot_migrator.py copy -s projects.packages.broadcom.com/vsphere/supervisor/dsm-consumption-operator/9.1.0.0/dsm-consumption-operator-supervisor:9.1.0.0.25261877 -t fleetlcm.aclab.uk
+./oci_image_depot_migrator.py copy -s projects.packages.broadcom.com/vsphere/iaas/lci-service/9.1.0/lci-package:9.1.0-b2d0d12e -t fleetlcm.aclab.uk
+./oci_image_depot_migrator.py copy -s projects.packages.broadcom.com/vsphere/iaas/vsphere-kubernetes-service/3.6.3/vsphere-kubernetes-service:3.6.3 -t fleetlcm.aclab.uk
+./oci_image_depot_migrator.py copy -s projects.packages.broadcom.com/vsphere/iaas/vsphere-kubernetes-service/3.7.0/vsphere-kubernetes-service:3.7.0 -t fleetlcm.aclab.uk
+./oci_image_depot_migrator.py copy -s projects.packages.broadcom.com/vsphere/iaas/ca-clusterissuer/0.0.2/ca-clusterissuer-bundle:v0.0.2 -t fleetlcm.aclab.uk
+./oci_image_depot_migrator.py copy -s projects.packages.broadcom.com/vsphere/iaas/nsx-management-proxy-service/0.2.2/nsx-management-proxy-service:0.2.2 -t fleetlcm.aclab.uk
+./oci_image_depot_migrator.py copy -s projects.packages.broadcom.com/vsphere/iaas/secret-store-service/9.0.0/secret-store-service:v9.0.0-c3eabdc -t fleetlcm.aclab.uk
+./oci_image_depot_migrator.py copy -s projects.packages.broadcom.com/vsphere/supervisor/argocd-service/1.1.0/argocd-service:v1.1.0_vmware.1 -t fleetlcm.aclab.uk
+./oci_image_depot_migrator.py copy -s projects.packages.broadcom.com/vsphere/supervisor/contour/1.33.1/contour:v1.33.1_vmware.2-vks.1 -t fleetlcm.aclab.uk
+./oci_image_depot_migrator.py copy -s projects.packages.broadcom.com/vsphere/supervisor/external-dns/0.18.0/external-dns:v0.18.0_vmware.3-vks.1 -t fleetlcm.aclab.uk
+./oci_image_depot_migrator.py copy -s projects.packages.broadcom.com/vsphere/supervisor/harbor-service/2.14.3/harbor:v2.14.3_vmware.2-vks.1 -t fleetlcm.aclab.uk
+./oci_image_depot_migrator.py copy -s projects.packages.broadcom.com/vsphere/supervisor/vks-standard-packages/3.6.0-20260211/vks-standard-packages:3.6.0-20260211 -t fleetlcm.aclab.uk

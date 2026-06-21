@@ -9,4 +9,4 @@
 ./oci_image_depot_migrator.py upload -s projects.packages.broadcom.com/vsphere/supervisor/contour/1.33.1/contour:v1.33.1_vmware.2-vks.1 -t fleetlcm.aclab.uk
 ./oci_image_depot_migrator.py upload -s projects.packages.broadcom.com/vsphere/supervisor/external-dns/0.18.0/external-dns:v0.18.0_vmware.3-vks.1 -t fleetlcm.aclab.uk
 ./oci_image_depot_migrator.py upload -s projects.packages.broadcom.com/vsphere/supervisor/harbor-service/2.14.3/harbor:v2.14.3_vmware.2-vks.1 -t fleetlcm.aclab.uk
-./oci_image_depot_migrator.py copy -s projects.packages.broadcom.com/vsphere/supervisor/vks-standard-packages/3.6.0-20260211/vks-standard-packages:3.6.0-20260211 -t fleetlcm.aclab.uk
+./oci_image_depot_migrator.py upload -s projects.packages.broadcom.com/vsphere/supervisor/vks-standard-packages/3.6.0-20260211/vks-standard-packages:3.6.0-20260211 -t fleetlcm.aclab.uk
