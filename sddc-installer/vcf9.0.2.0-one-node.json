@@ -1,4 +1,4 @@
-{
+{ 
     "fipsEnabled": true,
     "skipEsxThumbprintValidation": true,
     "skipGatewayPingValidation": true,
