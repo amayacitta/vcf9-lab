@@ -1,0 +1,53 @@
+{
+  "specVersion": "1.0",
+  "supervisorSpec": {
+    "supervisorName": "home-m01-cl01-sup01"
+  },
+  "envSpec": {
+    "vcenterDetails": {
+      "vcenterAddress": "vc01.aclab.uk",
+      "vcenterCluster": "home-m01-cl01"
+    }
+  },
+  "componentSpec": {
+    "mgmtNetworkSpec": {
+      "mgmtIpAssignmentMode": "STATICRANGE",
+      "mgmtNetworkName": "home-m01-cl01-vds01-pg-vm-mgmt",
+      "mgmtNetworkGatewayCidr": "10.166.101.254/24",
+      "mgmtNetworkStartingIp": "10.166.101.160 - 10.166.101.165",
+      "mgmtNetworkDnsServers": [
+        "10.166.101.254"
+      ],
+      "mgmtNetworkSearchDomains": [
+        "aclab.uk"
+      ],
+      "mgmtNetworkNtpServers": [
+        "10.166.101.254"
+      ]
+    },
+    "storagePolicySpec": {
+      "masterStoragePolicy": "home-m01-cl01 - Optimal Datastore Default Policy - AutoRAID",
+      "ephemeralStoragePolicy": "home-m01-cl01 - Optimal Datastore Default Policy - AutoRAID",
+      "imageStoragePolicy": "home-m01-cl01 - Optimal Datastore Default Policy - AutoRAID"
+    },
+    "nsxVpcNetworkInfo": {
+      "nsxVpcProject": "Default",
+      "nsxVpcConnectivityProfile": "Default VPC Connectivity Profile",
+      "workloadServiceCidr": "10.96.0.0/23",
+      "nsxVpcPrivateCidrs": [
+        "172.30.0.0/16"
+      ],
+      "nsxVpcDnsServers": [
+        "10.166.101.254"
+      ],
+      "nsxNtpDnsServers": [
+        "10.166.101.254"
+      ]
+    },
+    "controlPlaneSize": "SMALL",
+    "apiServerDnsNames": [
+      "sup01.aclab.uk"
+    ],
+    "cpvmCount": 1
+  }
+}
